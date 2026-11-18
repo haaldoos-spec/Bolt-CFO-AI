@@ -3,6 +3,7 @@ import { startSync, type SyncHandle, type SyncStatus } from '../lib/sync';
 import type { AppState, CheckIn, Place, DisciplineId, DogId, DogInfo, ProfileId, SessionRecord, TabId } from '../types';
 
 export type GeneratorPreset = { discipline?: DisciplineId | 'mix'; minutes?: number };
+export type PlacesSection = 'platser' | 'bilder' | 'dagbok';
 import { seedState } from '../data/seed';
 import { parseMapsLink } from '../lib/maps';
 import { DEFAULT_DOGS, OLD_DEFAULT_NAMES, THEMES } from '../data/profiles';
@@ -139,6 +140,8 @@ interface Ctx {
   openGenerator: (p: GeneratorPreset | null) => void;
   /** Om datan synkas med Claudes lagring eller bara finns på den här enheten */
   syncStatus: SyncStatus;
+  placesSection: PlacesSection;
+  setPlacesSection: (s: PlacesSection) => void;
 }
 
 const AppCtx = createContext<Ctx | null>(null);
@@ -158,6 +161,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [celebrate, setCelebrate] = useState(0);
   const [generator, openGenerator] = useState<GeneratorPreset | null>(null);
   const [syncStatus, setSyncStatus] = useState<SyncStatus>('ansluter');
+  const [placesSection, setPlacesSection] = useState<PlacesSection>('platser');
   const syncRef = useRef<SyncHandle | null>(null);
   const stateRef = useRef(state);
   stateRef.current = state;
@@ -234,8 +238,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
       generator,
       openGenerator,
       syncStatus,
+      placesSection,
+      setPlacesSection,
     }),
-    [state, profile, tab, toastMsg, pendingCheckin, celebrate, generator, syncStatus],
+    [state, profile, tab, toastMsg, pendingCheckin, celebrate, generator, syncStatus, placesSection],
   );
 
   return <AppCtx.Provider value={value}>{children}</AppCtx.Provider>;

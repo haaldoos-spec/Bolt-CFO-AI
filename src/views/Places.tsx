@@ -4,34 +4,12 @@ import type { CheckIn, DogId, Place, PlaceCategory } from '../types';
 import { useApp } from '../store/AppContext';
 import { DEFAULT_CENTER, HOME_LABEL, PLACES, PLACE_CATS, distanceKm } from '../data/places';
 import { dogsOf } from '../data/profiles';
-import { appleMapsDirectionsUrl, appleMapsPlaceAtUrl, appleMapsSearchUrl, googleMapsDirectionsUrl, googleMapsPlaceUrl, googleMapsSearchUrl, isAppleMobile, mapsAppName, parseMapsLink, type ParsedMapsLink, type TravelMode } from '../lib/maps';
+import { appleMapsPlaceAtUrl, googleMapsPlaceUrl, isAppleMobile, mapsAppName, parseMapsLink, type ParsedMapsLink } from '../lib/maps';
+import { destinationFor, directionsFor, mapsLinkFor } from '../lib/placeLinks';
+import { PhotoLibrary } from '../components/PhotoLibrary';
 import { Avatar, ICONS, SectionTitle, Sheet } from '../components/ui';
 
 const CAT_EMOJI: Record<PlaceCategory, string> = { skog: '🌲', balans: '🪨', cafe: '☕', vatten: '🌊' };
-
-/** Söktext för platser utan exakt position */
-const queryFor = (p: Place) => p.mapsQuery ?? `${p.name}, ${HOME_LABEL}`;
-
-/** Målet för kartappen: egna platser med exakt position, annars söktext */
-const destinationFor = (p: Place) => {
-  if (p.custom && !p.noCoords) return `${p.lat},${p.lng}`;
-  if (p.custom) return p.address ?? (/,/.test(p.name) ? p.name : `${p.name}, ${HOME_LABEL}`);
-  return queryFor(p);
-};
-
-/** Visa platsen – Apple Kartor på iPhone, Google Maps på datorn */
-const mapsLinkFor = (p: Place) => {
-  if (!isAppleMobile()) return p.mapsUrl?.includes('google') ? p.mapsUrl : googleMapsSearchUrl(destinationFor(p));
-  if (p.custom) return p.noCoords ? (p.mapsUrl || appleMapsSearchUrl(destinationFor(p))) : appleMapsPlaceAtUrl(p.lat, p.lng, p.name);
-  return appleMapsSearchUrl(queryFor(p));
-};
-
-/** Vägbeskrivning dit – det som öppnas när man trycker på en plats */
-const directionsFor = (p: Place, mode: TravelMode = 'driving') => {
-  // Kort delningslänk utan position eller adress: öppna länken själv – den visar exakt rätt plats
-  if (p.custom && p.noCoords && !p.address && p.mapsUrl) return p.mapsUrl;
-  return isAppleMobile() ? appleMapsDirectionsUrl(destinationFor(p), mode) : googleMapsDirectionsUrl(destinationFor(p), mode);
-};
 
 const distText = (p: Place) => {
   if (p.noCoords) return null;
@@ -352,7 +330,7 @@ function CheckinSheet({ open, onClose, initialPlace, questTitle, onSaved }: {
 }
 
 export function Places() {
-  const { state, dispatch, pendingCheckin, setPendingCheckin, toast } = useApp();
+  const { state, dispatch, pendingCheckin, setPendingCheckin, toast, placesSection, setPlacesSection } = useApp();
   const [filters, setFilters] = useState<PlaceCategory[]>([]);
   const [onlyMine, setOnlyMine] = useState(false);
   const [placeOpen, setPlaceOpen] = useState<Place | null>(null);
@@ -392,6 +370,26 @@ export function Places() {
 
   return (
     <div className="animate-rise">
+      <div className="glass mb-4 grid grid-cols-3 gap-1 p-1">
+        {([
+          ['platser', 'Platser'],
+          ['bilder', `Bilder${state.checkins.some((c) => c.photo) ? ` · ${state.checkins.filter((c) => c.photo).length}` : ''}`],
+          ['dagbok', 'Dagbok'],
+        ] as const).map(([id, label]) => (
+          <button
+            key={id}
+            onClick={() => setPlacesSection(id)}
+            className={`rounded-[18px] py-2.5 text-sm font-bold transition active:scale-95 ${placesSection === id ? 'text-ink' : 'text-white/60'}`}
+            style={placesSection === id ? { background: 'linear-gradient(120deg,var(--a1),var(--a2))' } : undefined}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+
+      {placesSection === 'bilder' && <PhotoLibrary onNew={() => setCheckin({})} />}
+
+      {placesSection === 'platser' && (<>
       <div className="-mx-4 mb-4 flex gap-2 overflow-x-auto px-4 no-scrollbar">
         <button
           onClick={() => setOnlyMine((v) => !v)}
@@ -448,6 +446,12 @@ export function Places() {
         </>
       )}
 
+      </>)}
+
+      {placesSection === 'dagbok' && (<>
+      <div className="mb-1 flex justify-end">
+        <button onClick={() => setCheckin({})} className="btn-accent !px-4 !py-2.5 text-sm"><Camera size={16} /> Nytt minne</button>
+      </div>
       <SectionTitle kicker="Bilddagbok" title="Tidslinje" right={<span className="text-xs font-semibold text-white/50">{timeline.length} minnen</span>} />
       <div className="mb-4 flex gap-2">
         {(['all', 'senior', 'puppy'] as const).map((f) => (
@@ -486,6 +490,8 @@ export function Places() {
         ))}
         {!timeline.length && <div className="text-sm text-white/50">Inga minnen än – tryck på ”Nytt minne”.</div>}
       </div>
+
+      </>)}
 
       {/* Platsinfo */}
       <Sheet open={!!placeOpen} onClose={() => { setPlaceOpen(null); setConfirmDelete(false); }} title={placeOpen?.name}>

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { ArrowRight, Bot, Camera, Check, ChevronRight, Clock, Dices, RotateCcw, Sparkles, Timer, Trophy } from 'lucide-react';
+import { Images, ArrowRight, Bot, Camera, Check, ChevronRight, Clock, Dices, RotateCcw, Sparkles, Timer, Trophy } from 'lucide-react';
 import type { Quest } from '../types';
 import { useApp } from '../store/AppContext';
 import { QUESTS } from '../data/quests';
@@ -205,7 +205,8 @@ function QuestCard() {
 }
 
 export function Home() {
-  const { state, profile, openGenerator, setTab } = useApp();
+  const { state, profile, openGenerator, setTab, setPlacesSection } = useApp();
+  const photos = state.checkins.filter((c) => c.photo).sort((a, b) => +new Date(b.date) - +new Date(a.date));
   const dogs = dogsOf(profile);
   const recent = state.sessions.filter((s) => s.dogs.some((d) => dogs.includes(d))).slice(0, 3);
 
@@ -237,6 +238,30 @@ export function Home() {
             </span>
           ))}
         </div>
+      </button>
+
+      <button
+        onClick={() => {
+          setPlacesSection('bilder');
+          setTab('map');
+        }}
+        className="glass flex w-full animate-rise items-center gap-4 p-4 text-left transition active:scale-[.98] [animation-delay:170ms]"
+      >
+        <div className="flex -space-x-3">
+          {photos.slice(0, 3).map((c) => (
+            <img key={c.id} src={c.photo} alt="" className="h-12 w-12 rounded-2xl border-2 border-[var(--bg)] object-cover" />
+          ))}
+          {!photos.length && (
+            <div className="grid h-12 w-12 place-items-center rounded-2xl bg-white/10">
+              <Images size={22} className="text-[var(--a2)]" />
+            </div>
+          )}
+        </div>
+        <div className="min-w-0 flex-1">
+          <div className="font-semibold">Bildbiblioteket</div>
+          <div className="text-xs text-white/55">{photos.length ? `${photos.length} ${photos.length === 1 ? 'bild' : 'bilder'} samlade` : 'Alla foton du sparar samlas här'}</div>
+        </div>
+        <ChevronRight size={18} className="text-white/40" />
       </button>
 
       <SectionTitle kicker="Nivåer" title="Hundarnas resa" />
