@@ -1,0 +1,85 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Registrerade custom properties → hela temat tonar mjukt vid profilbyte */
+@property --a1 { syntax: '<color>'; inherits: true; initial-value: #a78bfa; }
+@property --a2 { syntax: '<color>'; inherits: true; initial-value: #fcd34d; }
+@property --bg { syntax: '<color>'; inherits: true; initial-value: #110e1c; }
+@property --ink { syntax: '<color>'; inherits: true; initial-value: #1a1030; }
+@property --b1 { syntax: '<color>'; inherits: true; initial-value: #7c3aed; }
+@property --b2 { syntax: '<color>'; inherits: true; initial-value: #f59e0b; }
+@property --b3 { syntax: '<color>'; inherits: true; initial-value: #60a5fa; }
+
+:root {
+  transition: --a1 .9s ease, --a2 .9s ease, --bg .9s ease, --ink .9s ease, --b1 1.2s ease, --b2 1.2s ease, --b3 1.2s ease;
+  color-scheme: dark;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html, body { background: var(--bg); }
+body {
+  @apply font-sans text-white antialiased;
+  min-height: 100dvh;
+  overscroll-behavior-y: none;
+}
+
+@layer components {
+  .glass {
+    @apply rounded-3xl border border-white/[0.12] bg-white/[0.06] shadow-[0_8px_32px_-8px_rgba(0,0,0,.45)] backdrop-blur-xl;
+    background-image: linear-gradient(145deg, rgba(255,255,255,.09), rgba(255,255,255,.02));
+  }
+  .glass-strong {
+    @apply rounded-3xl border border-white/20 bg-white/[0.1] shadow-[0_20px_60px_-15px_rgba(0,0,0,.6)] backdrop-blur-2xl;
+  }
+  .btn-accent {
+    @apply inline-flex items-center justify-center gap-2 rounded-2xl px-5 py-3.5 font-semibold text-ink transition active:scale-[.97];
+    background: linear-gradient(120deg, var(--a1), var(--a2));
+    box-shadow: 0 10px 30px -10px var(--a1), inset 0 1px 0 rgba(255,255,255,.5);
+  }
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 rounded-2xl border border-white/15 bg-white/[0.06] px-4 py-3 font-medium text-white/90 transition hover:bg-white/10 active:scale-[.97];
+  }
+  .chip {
+    @apply inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/[0.06] px-3 py-1.5 text-xs font-semibold text-white/80;
+  }
+  .text-grad {
+    background: linear-gradient(110deg, var(--a1), var(--a2));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .glow-ring {
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--a1) 70%, transparent), 0 0 28px 4px color-mix(in srgb, var(--a1) 45%, transparent);
+  }
+  .label {
+    @apply text-[11px] font-bold uppercase tracking-[.14em] text-white/45;
+  }
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar { scrollbar-width: none; }
+}
+
+/* Leaflet i glas-tema */
+.leaflet-container { background: #0b0d14; font-family: inherit; }
+.leaflet-control-attribution { background: rgba(0,0,0,.4) !important; color: rgba(255,255,255,.5) !important; font-size: 9px !important; }
+.leaflet-control-attribution a { color: rgba(255,255,255,.7) !important; }
+.leaflet-control-zoom { display: none; }
+.leaflet-div-icon { background: transparent; border: 0; }
+.photo-pin {
+  width: 52px; height: 52px; border-radius: 9999px; overflow: hidden;
+  border: 3px solid white; box-shadow: 0 6px 20px rgba(0,0,0,.5), 0 0 0 4px color-mix(in srgb, var(--a1) 55%, transparent);
+  background: linear-gradient(135deg, var(--a1), var(--a2));
+  display: grid; place-items: center; font-size: 22px;
+  animation: pop .45s cubic-bezier(.2,1.4,.4,1) both;
+}
+.photo-pin img { width: 100%; height: 100%; object-fit: cover; }
+.place-pin {
+  width: 34px; height: 34px; border-radius: 9999px 9999px 9999px 4px; transform: rotate(-45deg);
+  display: grid; place-items: center; border: 2px solid rgba(255,255,255,.85);
+  box-shadow: 0 6px 18px rgba(0,0,0,.45);
+}
+.place-pin > span { transform: rotate(45deg); font-size: 15px; }
+.me-pin { width: 18px; height: 18px; border-radius: 9999px; background: #60a5fa; border: 3px solid white; box-shadow: 0 0 0 8px rgba(96,165,250,.25); }
+@keyframes pop { 0% { transform: scale(.4); opacity: 0 } 100% { transform: scale(1); opacity: 1 } }
+
+input[type=range] { accent-color: var(--a1); }

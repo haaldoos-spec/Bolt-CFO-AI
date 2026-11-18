@@ -1,0 +1,14 @@
+{
+  "name": "Labbeliv – träning & äventyr",
+  "short_name": "Labbeliv",
+  "description": "Hundträning och vardagsäventyr för två labradorer.",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0c0d1c",
+  "theme_color": "#0c0d1c",
+  "lang": "sv",
+  "icons": [
+    { "src": "/icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}
