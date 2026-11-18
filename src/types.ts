@@ -32,6 +32,8 @@ export interface Exercise {
   labbeHack?: { senior?: string; puppy?: string; general?: string };
   /** För kedjor/program: vilka byggstenar som ingår */
   builtFrom?: string[];
+  /** För program: momenten i ordning */
+  moments?: string[];
   pairTip?: string;
 }
 

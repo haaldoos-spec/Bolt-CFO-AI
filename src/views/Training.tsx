@@ -80,6 +80,20 @@ export function ExerciseSheet({ ex, onClose, onOpen }: { ex: Exercise | null; on
         </div>
       )}
 
+      {ex.moments && (
+        <div className="glass mt-5 p-4">
+          <div className="mb-3 flex items-center gap-2 text-sm font-bold"><Flag size={16} className="text-[var(--a2)]" /> Moment i programmet</div>
+          <ol className="space-y-2">
+            {ex.moments.map((m, i) => (
+              <li key={i} className="flex items-center gap-3 text-sm text-white/80">
+                <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-white/10 text-[11px] font-bold tabular-nums">{i + 1}</span>
+                {m}
+              </li>
+            ))}
+          </ol>
+        </div>
+      )}
+
       <div className="label mb-2 mt-6">Utrustning</div>
       <div className="grid grid-cols-3 gap-2">
         {ex.equipment.map((id) => {

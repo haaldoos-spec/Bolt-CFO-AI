@@ -1,4 +1,5 @@
 import type { Discipline, DisciplineId, Equipment, EquipmentId, Exercise } from '../types';
+import { BASE_PROGRAM_MOMENTS, MORE_EXERCISES } from './trainingMore';
 
 export const EQUIPMENT: Record<EquipmentId, Equipment> = {
   klicker: { id: 'klicker', name: 'Klicker' },
@@ -40,7 +41,7 @@ export const LEVEL_LABEL = {
   program: 'Program / bana',
 } as const;
 
-export const EXERCISES: Exercise[] = [
+const BASE_EXERCISES: Exercise[] = [
   // ───────────── VARDAGSLYDNAD ─────────────
   {
     id: 'v-kontakt', discipline: 'vardag', level: 'byggsten', title: 'Kontakt på namn',
@@ -481,6 +482,11 @@ export const EXERCISES: Exercise[] = [
     criteria: ['Mjuka rörelser, håll 3 sek åt varje håll'],
     labbeHack: { senior: 'Perfekt som uppvärmning och nedvarvning. Gör på halkfri matta.' },
   },
+];
+
+export const EXERCISES: Exercise[] = [
+  ...BASE_EXERCISES.map((e) => (BASE_PROGRAM_MOMENTS[e.id] ? { ...e, moments: BASE_PROGRAM_MOMENTS[e.id] } : e)),
+  ...MORE_EXERCISES,
 ];
 
 export const exerciseById = (id: string) => EXERCISES.find((e) => e.id === id);
