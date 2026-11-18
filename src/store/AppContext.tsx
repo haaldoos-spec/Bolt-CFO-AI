@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useMemo, useReducer, useRef, useState, type ReactNode } from 'react';
-import { startSync, type SyncHandle, type SyncStatus } from '../lib/sync';
+import { mergeStates, startSync, type SyncHandle, type SyncStatus } from '../lib/sync';
 import type { SessionPlan } from '../lib/session';
 import type { AppState, CheckIn, CustomPass, Exercise, Place, DisciplineId, DogId, DogInfo, ProfileId, SessionRecord, TabId } from '../types';
 
@@ -30,6 +30,7 @@ type Action =
   | { type: 'deleteExercise'; id: string };
 
 const KEY = 'labbeliv.state.v1';
+export const BACKUP_KEY = 'labbeliv.backup.v1';
 
 function reducer(s: AppState, a: Action): AppState {
   switch (a.type) {
@@ -52,11 +53,11 @@ function reducer(s: AppState, a: Action): AppState {
     case 'addCheckin':
       return { ...s, checkins: [a.checkin, ...s.checkins] };
     case 'deleteCheckin':
-      return { ...s, checkins: s.checkins.filter((c) => c.id !== a.id) };
+      return { ...s, checkins: s.checkins.filter((c) => c.id !== a.id), deletedIds: [...(s.deletedIds ?? []), a.id] };
     case 'addPlace':
       return { ...s, myPlaces: [a.place, ...s.myPlaces] };
     case 'deletePlace':
-      return { ...s, myPlaces: s.myPlaces.filter((p) => p.id !== a.id) };
+      return { ...s, myPlaces: s.myPlaces.filter((p) => p.id !== a.id), deletedIds: [...(s.deletedIds ?? []), a.id] };
     case 'toggleGuide': {
       const has = s.puppyGuide.includes(a.id);
       return {
@@ -69,8 +70,18 @@ function reducer(s: AppState, a: Action): AppState {
       return { ...s, questsDone: [{ id: crypto.randomUUID(), questId: a.questId, profile: a.profile, date: new Date().toISOString() }, ...s.questsDone] };
     case 'updateDog':
       return { ...s, dogs: { ...s.dogs, [a.dog]: { ...s.dogs[a.dog], ...a.patch } } };
-    case 'reset':
-      return seedState();
+    case 'reset': {
+      // Radera allt: markera alla id:n som borttagna så att synken tar bort dem överallt
+      const ids = [
+        ...s.sessions.map((x) => x.id),
+        ...s.checkins.map((x) => x.id),
+        ...s.myPlaces.map((x) => x.id),
+        ...s.questsDone.map((x) => x.id),
+        ...(s.customPasses ?? []).map((x) => x.id),
+        ...(s.customExercises ?? []).map((x) => x.id),
+      ];
+      return { ...seedState(), deletedIds: [...new Set([...(s.deletedIds ?? []), ...ids])] };
+    }
     case 'replace':
       return a.state;
     case 'savePass': {
@@ -78,7 +89,7 @@ function reducer(s: AppState, a: Action): AppState {
       return { ...s, customPasses: list.some((p) => p.id === a.pass.id) ? list.map((p) => (p.id === a.pass.id ? a.pass : p)) : [a.pass, ...list] };
     }
     case 'deletePass':
-      return { ...s, customPasses: (s.customPasses ?? []).filter((p) => p.id !== a.id) };
+      return { ...s, customPasses: (s.customPasses ?? []).filter((p) => p.id !== a.id), deletedIds: [...(s.deletedIds ?? []), a.id] };
     case 'saveExercise': {
       const list = s.customExercises ?? [];
       return { ...s, customExercises: list.some((e) => e.id === a.exercise.id) ? list.map((e) => (e.id === a.exercise.id ? a.exercise : e)) : [...list, a.exercise] };
@@ -87,6 +98,7 @@ function reducer(s: AppState, a: Action): AppState {
       return {
         ...s,
         customExercises: (s.customExercises ?? []).filter((e) => e.id !== a.id),
+        deletedIds: [...(s.deletedIds ?? []), a.id],
         customPasses: (s.customPasses ?? []).map((p) => ({ ...p, items: p.items.filter((it) => it.exerciseId !== a.id) })),
       };
   }
@@ -149,6 +161,7 @@ export function migrate(input: AppState): AppState {
       s.puppyGuide ??= [];
       s.customPasses ??= [];
       s.customExercises ??= [];
+      s.deletedIds ??= [];
       return s;
 }
 
@@ -254,6 +267,16 @@ export function AppProvider({ children }: { children: ReactNode }) {
       localStorage.setItem(KEY, JSON.stringify(state));
     } catch {
       /* fullt lagringsutrymme – ignorera i prototypen */
+    }
+    // Säkerhetskopia på enheten: sparar alltid det som någon gång funnits (inget tas bort härifrån
+    // utom det användaren själv raderat), så att data kan återställas om något går fel
+    try {
+      const raw = localStorage.getItem(BACKUP_KEY);
+      const prev = raw ? (JSON.parse(raw) as AppState) : null;
+      const next = prev ? mergeStates(prev, state) : state;
+      localStorage.setItem(BACKUP_KEY, JSON.stringify(next));
+    } catch {
+      /* för lite utrymme för kopian – hoppa över */
     }
   }, [state]);
 

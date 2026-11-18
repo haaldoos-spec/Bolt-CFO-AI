@@ -3,6 +3,9 @@ import { Camera, Clock, Flame, Image as ImageIcon, Pencil, RotateCcw, Star, Trop
 import type { DogId } from '../types';
 import { useApp } from '../store/AppContext';
 import { ageText, dogsOf } from '../data/profiles';
+import { BACKUP_KEY } from '../store/AppContext';
+import { mergeStates } from '../lib/sync';
+import type { AppState } from '../types';
 import { DISCIPLINES } from '../data/training';
 import { disciplineProgress } from '../lib/coach';
 import { levelInfo, levelTitle, streakFor } from '../lib/xp';
@@ -167,6 +170,19 @@ function WeekChart() {
 
 export function Profile() {
   const { state, profile, dispatch, toast, syncStatus } = useApp();
+  // Säkerhetskopia på enheten: finns det något där som saknas i appen?
+  const backupMissing = (() => {
+    try {
+      const raw = localStorage.getItem(BACKUP_KEY);
+      if (!raw) return null;
+      const b = JSON.parse(raw) as AppState;
+      const has = (ids: { id: string }[], l: { id: string }[]) => ids.filter((x) => !l.some((y) => y.id === x.id)).length;
+      const n = has(b.myPlaces ?? [], state.myPlaces) + has(b.checkins ?? [], state.checkins) + has(b.sessions ?? [], state.sessions) + has(b.customPasses ?? [], state.customPasses ?? []) + has(b.customExercises ?? [], state.customExercises ?? []);
+      return n ? { n, b } : null;
+    } catch {
+      return null;
+    }
+  })();
   const dogs = dogsOf(profile);
   const [confirmReset, setConfirmReset] = useState(false);
 
@@ -234,6 +250,17 @@ export function Profile() {
         ))}
       </div>
 
+      {backupMissing && (
+        <button
+          onClick={() => {
+            dispatch({ type: 'replace', state: mergeStates(backupMissing.b, state) });
+            toast(`${backupMissing.n} saker återställda från säkerhetskopian`);
+          }}
+          className="btn-accent mt-6 w-full"
+        >
+          <RotateCcw size={16} /> Återställ {backupMissing.n} saknade från enhetens säkerhetskopia
+        </button>
+      )}
       <div className={`glass mt-6 flex items-center gap-3 p-4 text-sm ${syncStatus === 'fel' ? 'border-rose-300/30' : ''}`}>
         <span
           className={`h-2.5 w-2.5 shrink-0 rounded-full ${syncStatus === 'synkad' ? 'bg-emerald-400' : syncStatus === 'ansluter' ? 'animate-pulse bg-amber-300' : syncStatus === 'fel' ? 'bg-rose-400' : 'bg-white/40'}`}

@@ -155,6 +155,8 @@ export interface AppState {
   customPasses?: CustomPass[];
   /** Egna övningar som användaren skapat */
   customExercises?: Exercise[];
+  /** Id:n som användaren medvetet tagit bort (så synken inte lägger tillbaka dem) */
+  deletedIds?: string[];
   /** Version av demodatan, för migrering */
   seedVersion?: number;
   questsDone: { id: string; questId: string; date: string; profile: ProfileId }[];
