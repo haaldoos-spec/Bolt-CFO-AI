@@ -1,5 +1,6 @@
 import type { Discipline, DisciplineId, Equipment, EquipmentId, Exercise } from '../types';
 import { BASE_PROGRAM_MOMENTS, MORE_EXERCISES } from './trainingMore';
+import { SPORT_EXERCISES } from './trainingSports';
 
 export const EQUIPMENT: Record<EquipmentId, Equipment> = {
   klicker: { id: 'klicker', name: 'Klicker' },
@@ -94,6 +95,33 @@ export const DISCIPLINES: Discipline[] = [
         'Hunden får tävla först när den fyllt 18 månader.',
         'Officiell mätning för storleksklass görs tidigast vid 18 månader och slutgiltigt före start efter 24 månader.',
         'Banorna i appen är inte tävlingsbanor – de är valpanpassade förberedelser utan hopp.',
+      ],
+    },
+  },
+  {
+    id: 'freestyle', name: 'Freestyle & HtM', tagline: 'Kreativ lydnad till musik', goalLabel: 'Freestyle klass 1', icon: 'Music',
+    rules: {
+      org: 'SKK / Svenska Hundfreestyleklubben (SHFK)', period: 'Sammanfattning från SKK och SHFK', official: true,
+      facts: [
+        'Alla hundar som fyllt 12 månader får tävla. Du behöver vara medlem i en klubb inom SKK.',
+        'Två grenar: freestyle med nästan fritt valda rörelser, och heelwork to music (HtM) som byggs kring tio fasta positioner runt föraren.',
+        'Tre klasser. Programmet får vara högst 2,5 min i klass 1, 3,5 min i klass 2 och 4 min i klass 3.',
+        'Bedöms i tre kategorier – precision, innehåll och tolkning av musiken – med högst 10 poäng var.',
+        'Rekvisita får finnas i ringen men inte användas som leksak för hunden.',
+      ],
+    },
+  },
+  {
+    id: 'bruks', name: 'Bruks', tagline: 'Lydnad + spår eller sök – appellklass', goalLabel: 'Appellklass', icon: 'Medal',
+    rules: {
+      org: 'Svenska Brukshundklubben (SBK) – Regler bruksprov', period: 'Gäller 2023-01-01 – 2026-12-31', official: true,
+      facts: [
+        'Appellklass från 12 månader. Lägre klass kräver uppflyttning i appellklass och att hunden fyllt 18 månader.',
+        'Från 18 månader krävs mentalbeskrivning (MH). För raser som SBK inte har avelsansvar för, som labrador, kan MH ersättas med BPH.',
+        'Skyddshundsgruppen är bara öppen för raser som SBK har avelsansvar för – inte labrador. Spår, sök och rapport går bra.',
+        'Lydnad (koeff. 16): linförighet i koppel, framförgående, platsläggande, inkallande, hopp över hinder och platsliggande 3 min.',
+        'Specialmoment (koeff. 9): budföring ca 50 m + spår (ca 300 m, 40–50 min, tre föremål), rapportföring eller genomsök av område.',
+        'Godkänt: 125 poäng varav 45 i specialmoment. Uppflyttning: 175 poäng varav 63.',
       ],
     },
   },
@@ -562,6 +590,7 @@ const BASE_EXERCISES: Exercise[] = [
 export const EXERCISES: Exercise[] = [
   ...BASE_EXERCISES.map((e) => (BASE_PROGRAM_MOMENTS[e.id] ? { ...e, moments: BASE_PROGRAM_MOMENTS[e.id] } : e)),
   ...MORE_EXERCISES,
+  ...SPORT_EXERCISES,
 ];
 
 export const exerciseById = (id: string) => EXERCISES.find((e) => e.id === id);
