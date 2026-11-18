@@ -70,17 +70,32 @@ export function parseMapsLink(text: string): ParsedMapsLink | null {
   if (host.includes('maps.apple')) {
     out.source = 'apple';
     const p = u.searchParams;
-    const c = pair(p.get('coordinate')) ?? pair(p.get('ll')) ?? pair(p.get('sll')) ?? pair(p.get('q'));
+    // coordinate/ll är platsens position. sll är bara sökområdet och används inte.
+    const c = pair(p.get('coordinate')) ?? pair(p.get('ll')) ?? pair(p.get('q')) ?? pair(p.get('daddr'));
     if (c) [out.lat, out.lng] = c;
     const name = p.get('name') ?? p.get('q') ?? p.get('address') ?? undefined;
     if (name && !pair(name)) out.name = name;
   } else if (host.includes('google') || host.includes('goo.gl')) {
     out.source = 'google';
-    const at = u.pathname.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/) ?? raw.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/);
-    const c = at ? ([Number(at[1]), Number(at[2])] as [number, number]) : pair(u.searchParams.get('q')) ?? pair(u.searchParams.get('query'));
+    // Platsens egen position ligger i "!3d<lat>!4d<lng>". "@lat,lng" är bara kartans mittpunkt
+    // (där man råkade titta) och används bara som sista utväg.
+    const pinMatches = [...raw.matchAll(/!3d(-?\d+\.\d+)!4d(-?\d+\.\d+)/g)];
+    const pin = pinMatches.length ? pinMatches[pinMatches.length - 1] : null;
+    const pathPair = decodeURIComponent(u.pathname).match(/\/(?:search|place|dir\/[^/]*)\/(-?\d{1,3}\.\d+),\s*\+?(-?\d{1,3}\.\d+)/);
+    const at = raw.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/);
+    const c: [number, number] | undefined = pin
+      ? [Number(pin[1]), Number(pin[2])]
+      : pathPair
+        ? [Number(pathPair[1]), Number(pathPair[2])]
+        : pair(u.searchParams.get('q')) ?? pair(u.searchParams.get('query')) ?? pair(u.searchParams.get('destination')) ?? pair(u.searchParams.get('ll')) ??
+          (at ? [Number(at[1]), Number(at[2])] : undefined);
     if (c) [out.lat, out.lng] = c;
     const place = u.pathname.match(/\/place\/([^/]+)/);
-    if (place) out.name = decodeURIComponent(place[1].replace(/\+/g, ' '));
+    if (place) {
+      const n = decodeURIComponent(place[1].replace(/\+/g, ' '));
+      // Utplacerad nål ger koordinater som namn (t.ex. 57°47'25"N) – hoppa över dem
+      if (!/°|^-?\d+\.\d+,/.test(n)) out.name = n;
+    }
     const q = u.searchParams.get('q') ?? u.searchParams.get('query');
     if (!out.name && q && !pair(q)) out.name = q;
   }

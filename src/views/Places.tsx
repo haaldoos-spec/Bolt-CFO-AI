@@ -13,7 +13,11 @@ const CAT_EMOJI: Record<PlaceCategory, string> = { skog: '🌲', balans: '🪨',
 const queryFor = (p: Place) => p.mapsQuery ?? `${p.name}, ${HOME_LABEL}`;
 
 /** Målet för kartappen: egna platser med exakt position, annars söktext */
-const destinationFor = (p: Place) => (p.custom && !p.noCoords ? `${p.lat},${p.lng}` : p.custom ? p.name : queryFor(p));
+const destinationFor = (p: Place) => {
+  if (p.custom && !p.noCoords) return `${p.lat},${p.lng}`;
+  if (p.custom) return /,/.test(p.name) ? p.name : `${p.name}, ${HOME_LABEL}`;
+  return queryFor(p);
+};
 
 /** Visa platsen – Apple Kartor på iPhone, Google Maps på datorn */
 const mapsLinkFor = (p: Place) => {

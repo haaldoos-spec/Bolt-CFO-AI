@@ -3,6 +3,7 @@ import type { AppState, CheckIn, Place, DisciplineId, DogId, DogInfo, ProfileId,
 
 export type GeneratorPreset = { discipline?: DisciplineId | 'mix'; minutes?: number };
 import { seedState } from '../data/seed';
+import { parseMapsLink } from '../lib/maps';
 import { DEFAULT_DOGS, OLD_DEFAULT_NAMES, THEMES } from '../data/profiles';
 
 type Action =
@@ -91,6 +92,12 @@ const load = (): AppState => {
         s.seedVersion = 3;
       }
       s.myPlaces ??= [];
+      // Läs om positionen ur sparade kartlänkar (rättar platser sparade med kartans mittpunkt i stället för platsen)
+      s.myPlaces = s.myPlaces.map((p) => {
+        if (!p.mapsUrl) return p;
+        const parsed = parseMapsLink(p.mapsUrl);
+        return parsed?.lat !== undefined && parsed.lng !== undefined ? { ...p, lat: parsed.lat, lng: parsed.lng, noCoords: false } : p;
+      });
       s.puppyGuide ??= [];
       // Demominnen följer med när demoplatserna byts (t.ex. till Jönköping/Huskvarna)
       return s;
