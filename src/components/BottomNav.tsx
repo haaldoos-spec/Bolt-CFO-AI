@@ -4,7 +4,7 @@ import { useApp } from '../store/AppContext';
 
 const TABS: { id: TabId; label: string; icon: typeof House }[] = [
   { id: 'home', label: 'Hem', icon: House },
-  { id: 'map', label: 'Karta & Dagbok', icon: Map },
+  { id: 'map', label: 'Platser', icon: Map },
   { id: 'training', label: 'Träning', icon: Dumbbell },
   { id: 'profile', label: 'Statistik', icon: ChartNoAxesColumn },
 ];

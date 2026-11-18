@@ -59,64 +59,7 @@ body {
   .no-scrollbar { scrollbar-width: none; }
 }
 
-/* Leaflet i glas-tema */
-.leaflet-container { background: #0b0d14; font-family: inherit; }
-.leaflet-control-attribution { background: rgba(0,0,0,.4) !important; color: rgba(255,255,255,.5) !important; font-size: 9px !important; }
-.leaflet-control-attribution a { color: rgba(255,255,255,.7) !important; }
-.leaflet-control-zoom { display: none; }
-.leaflet-div-icon { background: transparent; border: 0; }
-.photo-pin {
-  width: 52px; height: 52px; border-radius: 9999px; overflow: hidden;
-  border: 3px solid white; box-shadow: 0 6px 20px rgba(0,0,0,.5), 0 0 0 4px color-mix(in srgb, var(--a1) 55%, transparent);
-  background: linear-gradient(135deg, var(--a1), var(--a2));
-  display: grid; place-items: center; font-size: 22px;
-  animation: pop .45s cubic-bezier(.2,1.4,.4,1) both;
-}
-.photo-pin img { width: 100%; height: 100%; object-fit: cover; }
-.place-pin {
-  width: 34px; height: 34px; border-radius: 9999px 9999px 9999px 4px; transform: rotate(-45deg);
-  display: grid; place-items: center; border: 2px solid rgba(255,255,255,.85);
-  box-shadow: 0 6px 18px rgba(0,0,0,.45);
-}
-.place-pin > span { transform: rotate(45deg); font-size: 15px; }
-.me-pin { width: 18px; height: 18px; border-radius: 9999px; background: #60a5fa; border: 3px solid white; box-shadow: 0 0 0 8px rgba(96,165,250,.25); }
-@keyframes pop { 0% { transform: scale(.4); opacity: 0 } 100% { transform: scale(1); opacity: 1 } }
-
 input[type=range] { accent-color: var(--a1); }
 
 /* Inuti Claude-artefakten paddar värdsidan redan :root med safe-area */
 html.artifact .app-header { padding-top: 14px; }
-
-.place-label { background: rgba(10,12,20,.72) !important; border: 1px solid rgba(255,255,255,.18) !important; color: #fff !important; border-radius: 9999px !important; padding: 2px 8px !important; font-size: 10.5px !important; font-weight: 700; box-shadow: none !important; }
-.place-label::before { display: none; }
-.labels-hidden .place-label { display: none; }
-.my-pin {
-  width: 38px; height: 38px; border-radius: 9999px 9999px 9999px 4px; transform: rotate(-45deg);
-  display: grid; place-items: center; border: 2px solid #fff;
-  background: linear-gradient(135deg, #fde68a, #f59e0b);
-  box-shadow: 0 6px 20px rgba(0,0,0,.5), 0 0 18px rgba(253,230,138,.6);
-}
-.my-pin > span { transform: rotate(45deg); font-size: 16px; }
-.leaflet-container { background: #10131c; }
-.leaflet-control-attribution .leaflet-attribution-flag { display: none !important; }
-/* Namn ur OpenStreetMap (stadsdelar, sjöar, hundrastgårdar) */
-.osm-label { pointer-events: none; }
-.osm-label span {
-  position: absolute; transform: translate(-50%, -50%); white-space: nowrap;
-  font-size: 11px; font-weight: 700; letter-spacing: .02em; color: rgba(226,232,255,.55);
-  text-shadow: 0 1px 3px #000, 0 0 8px #10131c; display: none;
-}
-.osm-label.k-water span { color: rgba(125,190,240,.75); font-style: italic; }
-.osm-label.k-dog_park span { color: #fcd34d; background: rgba(10,12,20,.75); border: 1px solid rgba(252,211,77,.4); border-radius: 9999px; padding: 2px 8px; text-shadow: none; }
-.osm-label.k-town span, .osm-label.k-city span { font-size: 14px; color: rgba(255,255,255,.75); text-transform: uppercase; letter-spacing: .12em; }
-.leaflet-container .osm-label.k-town span, .leaflet-container .osm-label.k-city span, .leaflet-container .osm-label.k-water span { display: block; }
-.zoom-ge-13 .osm-label.k-suburb span, .zoom-ge-13 .osm-label.k-village span, .zoom-ge-13 .osm-label.k-dog_park span { display: block; }
-.zoom-ge-15 .osm-label.k-neighbourhood span, .zoom-ge-15 .osm-label.k-quarter span, .zoom-ge-15 .osm-label.k-hamlet span, .zoom-ge-15 .osm-label.k-locality span { display: block; }
-.zoom-ge-13 .osm-label.k-town span, .zoom-ge-13 .osm-label.k-city span { opacity: .5; }
-/* Reserv när kartdata saknas i artefakten */
-.leaflet-container.map-offline {
-  background:
-    linear-gradient(rgba(255,255,255,.045) 1px, transparent 1px) 0 0 / 40px 40px,
-    linear-gradient(90deg, rgba(255,255,255,.045) 1px, transparent 1px) 0 0 / 40px 40px,
-    #0b0d14;
-}

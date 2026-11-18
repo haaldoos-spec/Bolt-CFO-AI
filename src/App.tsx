@@ -4,7 +4,7 @@ import { BottomNav } from './components/BottomNav';
 import { Background, Confetti, Toast } from './components/ui';
 import { SessionFlow } from './components/SessionFlow';
 import { Home } from './views/Home';
-import { MapDiary } from './views/MapDiary';
+import { Places } from './views/Places';
 import { Training } from './views/Training';
 import { Profile } from './views/Profile';
 
@@ -17,7 +17,7 @@ export default function App() {
         <Header />
         <main key={tab} className="animate-fade px-4 pt-5">
           {tab === 'home' && <Home />}
-          {tab === 'map' && <MapDiary />}
+          {tab === 'map' && <Places />}
           {tab === 'training' && <Training />}
           {tab === 'profile' && <Profile />}
         </main>

@@ -16,7 +16,7 @@ self.addEventListener('fetch', (e) => {
     e.respondWith(fetch(req).catch(() => caches.match('/')));
     return;
   }
-  if (url.origin === location.origin || url.hostname.includes('basemaps.cartocdn.com') || url.hostname.includes('fonts.g')) {
+  if (url.origin === location.origin || url.hostname.includes('fonts.g')) {
     e.respondWith(
       caches.match(req).then((hit) => hit || fetch(req).then((res) => {
         const copy = res.clone();

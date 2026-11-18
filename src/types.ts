@@ -72,6 +72,10 @@ export interface Place {
   puppyFriendly: boolean;
   /** Egen markerad favoritplats */
   custom?: boolean;
+  /** Länk till platsen i Apple Kartor / Google Maps (inklistrad) */
+  mapsUrl?: string;
+  /** Saknar koordinater (t.ex. kort delningslänk) – visas utan avstånd */
+  noCoords?: boolean;
   createdAt?: string;
 }
 

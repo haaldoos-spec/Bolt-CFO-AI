@@ -1,6 +1,6 @@
 # Labbeliv – träning & äventyr för två labradorer
 
-PWA-prototyp i React + TypeScript + Tailwind CSS + Lucide, med Leaflet-karta.
+PWA-prototyp i React + TypeScript + Tailwind CSS + Lucide.
 
 ## Kom igång
 ```bash
@@ -13,7 +13,8 @@ npm run build && npm run preview   # produktionsbygge med service worker
 - `src/data/` – mock-data: profiler & teman, övningar (byggsten → kedja → program), quests, kartplatser, demohistorik
 - `src/lib/` – Smart Coach-regler, pass-generator, XP/nivåer/streaks
 - `src/store/AppContext.tsx` – global state (sparas i localStorage) + temabyte via CSS-variabler
-- `src/views/` – Hem, Karta & Bilddagbok, Träning & Sporter, Profil & Statistik
+- `src/views/` – Hem, Platser & Bilddagbok, Träning & Sporter, Profil & Statistik
+- `src/lib/maps.ts` – länkar till Apple Kartor/Google Maps och tolkning av delade kartlänkar
 - `src/components/` – header/profilväxlare, bottenmeny, pass-generator & timer, glas-UI
 
 ## Egna 3D-avatarer
@@ -25,5 +26,5 @@ Namn går att ändra genom att trycka på hundens namn där.
 ```bash
 npm run build:artifact   # → dist-artifact/labbeliv.html (allt i en fil)
 ```
-Filen publiceras som en Claude-artefakt. I artefaktläget visas en stiliserad karta
-(externa kartbilder blockeras där) och platser får en länk till Apple Kartor.
+Filen publiceras som en Claude-artefakt. Platser öppnas i Apple Kartor via länkar, och egna platser
+sparas genom att klistra in en delad länk från Kartor.
