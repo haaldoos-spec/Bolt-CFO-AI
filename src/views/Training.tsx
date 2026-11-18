@@ -1,11 +1,12 @@
 import { useMemo, useState } from 'react';
-import { ArrowLeft, Check, ChevronRight, Scale, Clock, Flag, Layers, Lightbulb, Link2, PawPrint, Puzzle, Sparkles, Target, Timer, Trophy, Users } from 'lucide-react';
+import { ArrowLeft, Check, ChevronRight, ListPlus, Scale, Clock, Flag, Layers, Lightbulb, Link2, PawPrint, Puzzle, Sparkles, Target, Timer, Trophy, Users } from 'lucide-react';
 import type { DisciplineId, DogId, Exercise, ExerciseLevel } from '../types';
 import { useApp } from '../store/AppContext';
 import { DISCIPLINES, EQUIPMENT, EXERCISES, LEVEL_LABEL, disciplineById, exerciseById } from '../data/training';
 import { dogsOf } from '../data/profiles';
 import { disciplineProgress } from '../lib/coach';
 import { PuppyGuideCard } from '../components/PuppyGuide';
+import { MyPasses, useAddToPass } from '../components/PassBuilder';
 import { Avatar, EQUIP_ICONS, ICONS, Progress, SectionTitle, Sheet } from '../components/ui';
 
 const LEVEL_ICON: Record<ExerciseLevel, typeof Puzzle> = { byggsten: Puzzle, kedja: Link2, program: Trophy };
@@ -42,6 +43,7 @@ function CheckButton({ dog, ex }: { dog: DogId; ex: Exercise }) {
 
 export function ExerciseSheet({ ex, onClose, onOpen }: { ex: Exercise | null; onClose: () => void; onOpen: (e: Exercise) => void }) {
   const { profile, state, openGenerator } = useApp();
+  const addToPass = useAddToPass();
   if (!ex) return null;
   const dogs = dogsOf(profile).filter((d) => ex.suits.includes(d));
   const hacks = [
@@ -163,8 +165,11 @@ export function ExerciseSheet({ ex, onClose, onOpen }: { ex: Exercise | null; on
         )}
       </div>
 
-      <button onClick={() => { onClose(); openGenerator({ discipline: ex.discipline, minutes: 15 }); }} className="btn-accent mt-5 w-full">
-        <Timer size={18} /> Träna {disciplineById(ex.discipline).name.toLowerCase()} nu
+      <button onClick={() => addToPass(ex)} className="btn-accent mt-5 w-full">
+        <ListPlus size={18} /> Lägg till i eget pass
+      </button>
+      <button onClick={() => { onClose(); openGenerator({ discipline: ex.discipline, minutes: 15 }); }} className="btn-ghost mt-2 w-full">
+        <Timer size={18} /> Slumpa ett {disciplineById(ex.discipline).name.toLowerCase()}pass
       </button>
     </Sheet>
   );
@@ -310,6 +315,9 @@ export function Training() {
             </div>
             <ChevronRight className="relative text-white/50" />
           </button>
+
+          <SectionTitle kicker="Eget upplägg" title="Mina pass" />
+          <MyPasses />
 
           <SectionTitle kicker="Sporter" title="Träningsgrenar" />
           <div className="grid grid-cols-2 gap-3">

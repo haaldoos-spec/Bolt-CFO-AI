@@ -120,6 +120,26 @@ export interface DogInfo {
   weightKg: number;
 }
 
+export interface CustomPassItem {
+  id: string;
+  exerciseId: string;
+  minutes: number;
+  /** Vilken hund som gör övningen (vid båda hundarna) */
+  dog?: DogId;
+}
+
+export interface CustomPass {
+  id: string;
+  name: string;
+  dogs: DogId[];
+  items: CustomPassItem[];
+  warmup: boolean;
+  pauses: boolean;
+  cooldown: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface AppState {
   dogs: Record<DogId, DogInfo>;
   xp: Record<DogId, number>;
@@ -129,6 +149,8 @@ export interface AppState {
   myPlaces: Place[];
   /** Avbockade punkter i guiden Första tiden med valpen */
   puppyGuide: string[];
+  /** Egna pass som användaren byggt */
+  customPasses?: CustomPass[];
   /** Version av demodatan, för migrering */
   seedVersion?: number;
   questsDone: { id: string; questId: string; date: string; profile: ProfileId }[];

@@ -1,4 +1,4 @@
-import type { DisciplineId, DogId, Exercise } from '../types';
+import type { CustomPass, DisciplineId, DogId, Exercise } from '../types';
 import { COOLDOWNS, EXERCISES, WARMUPS } from '../data/training';
 
 export type StepKind = 'warmup' | 'work' | 'rest' | 'cooldown';
@@ -19,6 +19,8 @@ export interface SessionPlan {
   minutes: number;
   steps: SessionStep[];
   intensity: 1 | 2 | 3;
+  /** Namn på passet (egna pass) */
+  title?: string;
 }
 
 const shuffle = <T,>(a: T[]) => {
@@ -118,3 +120,48 @@ export function buildSession(dogs: DogId[], discipline: DisciplineId | 'mix', mi
 }
 
 export const fmt = (s: number) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
+
+/** Gör ett eget pass till en körbar plan med timer */
+export function planFromCustom(pass: CustomPass): SessionPlan {
+  const dogs = pass.dogs;
+  const dual = dogs.length === 2;
+  const steps: SessionStep[] = [];
+  const hasSenior = dogs.includes('senior');
+  const hasPuppy = dogs.includes('puppy');
+  if (pass.warmup) {
+    const list = hasSenior ? WARMUPS.senior : WARMUPS.puppy;
+    steps.push({ kind: 'warmup', title: 'Uppvärmning', detail: list.join(' · '), seconds: (hasSenior ? 5 : 3) * 60 });
+  }
+  pass.items.forEach((it, i) => {
+    const ex = EXERCISES.find((e) => e.id === it.exerciseId);
+    if (!ex) return;
+    const dog = it.dog ?? (dual ? dogs[i % 2] : dogs[0]);
+    steps.push({
+      kind: 'work',
+      title: ex.title,
+      detail: ex.steps[0],
+      seconds: Math.max(1, it.minutes) * 60,
+      dog,
+      waitingDog: dual ? dogs.find((d) => d !== dog) : undefined,
+      exerciseId: ex.id,
+    });
+    if (pass.pauses && i < pass.items.length - 1) {
+      steps.push({ kind: 'rest', title: 'Vilopaus', detail: 'Vatten, lugn och en klapp.', seconds: dog === 'puppy' ? 90 : 60, dog });
+    }
+  });
+  if (pass.cooldown) {
+    const list = hasPuppy && !hasSenior ? COOLDOWNS.puppy : COOLDOWNS.senior;
+    steps.push({ kind: 'cooldown', title: 'Nedvarvning', detail: list.join(' · '), seconds: 3 * 60 });
+  }
+  const exs = pass.items.map((it) => EXERCISES.find((e) => e.id === it.exerciseId)).filter(Boolean) as Exercise[];
+  const avg = exs.reduce((a, e) => a + e.intensity, 0) / Math.max(1, exs.length);
+  const discs = [...new Set(exs.map((e) => e.discipline))];
+  return {
+    dogs,
+    discipline: discs.length === 1 ? discs[0] : 'mix',
+    minutes: Math.round(steps.reduce((a, s) => a + s.seconds, 0) / 60),
+    steps,
+    intensity: Math.min(3, Math.max(1, Math.round(avg) || 1)) as 1 | 2 | 3,
+    title: pass.name,
+  };
+}

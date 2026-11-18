@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useMemo, useReducer, useRef, useState, type ReactNode } from 'react';
 import { startSync, type SyncHandle, type SyncStatus } from '../lib/sync';
-import type { AppState, CheckIn, Place, DisciplineId, DogId, DogInfo, ProfileId, SessionRecord, TabId } from '../types';
+import type { SessionPlan } from '../lib/session';
+import type { AppState, CheckIn, CustomPass, Place, DisciplineId, DogId, DogInfo, ProfileId, SessionRecord, TabId } from '../types';
 
 export type GeneratorPreset = { discipline?: DisciplineId | 'mix'; minutes?: number };
 export type PlacesSection = 'platser' | 'bilder' | 'dagbok';
@@ -20,7 +21,9 @@ type Action =
   | { type: 'questDone'; questId: string; profile: ProfileId }
   | { type: 'updateDog'; dog: DogId; patch: Partial<DogInfo> }
   | { type: 'reset' }
-  | { type: 'replace'; state: AppState };
+  | { type: 'replace'; state: AppState }
+  | { type: 'savePass'; pass: CustomPass }
+  | { type: 'deletePass'; id: string };
 
 const KEY = 'labbeliv.state.v1';
 
@@ -66,6 +69,12 @@ function reducer(s: AppState, a: Action): AppState {
       return seedState();
     case 'replace':
       return a.state;
+    case 'savePass': {
+      const list = s.customPasses ?? [];
+      return { ...s, customPasses: list.some((p) => p.id === a.pass.id) ? list.map((p) => (p.id === a.pass.id ? a.pass : p)) : [a.pass, ...list] };
+    }
+    case 'deletePass':
+      return { ...s, customPasses: (s.customPasses ?? []).filter((p) => p.id !== a.id) };
   }
 }
 
@@ -109,6 +118,7 @@ export function migrate(input: AppState): AppState {
         return parsed?.lat !== undefined && parsed.lng !== undefined ? { ...p, lat: parsed.lat, lng: parsed.lng, noCoords: false } : p;
       });
       s.puppyGuide ??= [];
+      s.customPasses ??= [];
       return s;
 }
 
@@ -142,6 +152,16 @@ interface Ctx {
   syncStatus: SyncStatus;
   placesSection: PlacesSection;
   setPlacesSection: (s: PlacesSection) => void;
+  /** Passet som byggs just nu (eget pass) */
+  passDraft: CustomPass | null;
+  setPassDraft: React.Dispatch<React.SetStateAction<CustomPass | null>>;
+  builderOpen: boolean;
+  setBuilderOpen: (v: boolean) => void;
+  /** Plan att köra med timer / logga i efterhand (hanteras av SessionFlow) */
+  planToRun: SessionPlan | null;
+  setPlanToRun: (p: SessionPlan | null) => void;
+  planToRate: SessionPlan | null;
+  setPlanToRate: (p: SessionPlan | null) => void;
 }
 
 const AppCtx = createContext<Ctx | null>(null);
@@ -162,6 +182,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [generator, openGenerator] = useState<GeneratorPreset | null>(null);
   const [syncStatus, setSyncStatus] = useState<SyncStatus>('ansluter');
   const [placesSection, setPlacesSection] = useState<PlacesSection>('platser');
+  const [passDraft, setPassDraft] = useState<CustomPass | null>(null);
+  const [builderOpen, setBuilderOpen] = useState(false);
+  const [planToRun, setPlanToRun] = useState<SessionPlan | null>(null);
+  const [planToRate, setPlanToRate] = useState<SessionPlan | null>(null);
   const syncRef = useRef<SyncHandle | null>(null);
   const stateRef = useRef(state);
   stateRef.current = state;
@@ -240,8 +264,16 @@ export function AppProvider({ children }: { children: ReactNode }) {
       syncStatus,
       placesSection,
       setPlacesSection,
+      passDraft,
+      setPassDraft,
+      builderOpen,
+      setBuilderOpen,
+      planToRun,
+      setPlanToRun,
+      planToRate,
+      setPlanToRate,
     }),
-    [state, profile, tab, toastMsg, pendingCheckin, celebrate, generator, syncStatus, placesSection],
+    [state, profile, tab, toastMsg, pendingCheckin, celebrate, generator, syncStatus, placesSection, passDraft, builderOpen, planToRun, planToRate],
   );
 
   return <AppCtx.Provider value={value}>{children}</AppCtx.Provider>;

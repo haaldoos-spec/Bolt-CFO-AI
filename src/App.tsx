@@ -3,6 +3,7 @@ import { Header } from './components/Header';
 import { BottomNav } from './components/BottomNav';
 import { Background, Confetti, Toast } from './components/ui';
 import { SessionFlow } from './components/SessionFlow';
+import { PassBuilder, PassDraftPill } from './components/PassBuilder';
 import { Home } from './views/Home';
 import { Places } from './views/Places';
 import { Training } from './views/Training';
@@ -24,6 +25,8 @@ export default function App() {
       </div>
       <BottomNav />
       <SessionFlow />
+      <PassBuilder />
+      <PassDraftPill />
       <Toast />
       <Confetti />
     </>

@@ -17,13 +17,27 @@ const KIND_META: Record<StepKind, { label: string; icon: typeof Flame; color: st
 type DogChoice = 'senior' | 'puppy' | 'both';
 
 export function SessionFlow() {
-  const { generator, openGenerator, profile } = useApp();
+  const { generator, openGenerator, profile, planToRun, setPlanToRun, planToRate, setPlanToRate } = useApp();
   const [dogChoice, setDogChoice] = useState<DogChoice>(profile);
   const [discipline, setDiscipline] = useState<DisciplineId | 'mix'>('mix');
   const [minutes, setMinutes] = useState(15);
   const [seed, setSeed] = useState(0);
   const [running, setRunning] = useState<SessionPlan | null>(null);
   const [rating, setRating] = useState<SessionPlan | null>(null);
+
+  // Egna pass startas/loggas från andra vyer via context
+  useEffect(() => {
+    if (planToRun) {
+      setRunning(planToRun);
+      setPlanToRun(null);
+    }
+  }, [planToRun, setPlanToRun]);
+  useEffect(() => {
+    if (planToRate) {
+      setRating(planToRate);
+      setPlanToRate(null);
+    }
+  }, [planToRate, setPlanToRate]);
 
   useEffect(() => {
     if (generator) {
@@ -312,7 +326,7 @@ function RatingSheet({ plan, onClose }: { plan: SessionPlan | null; onClose: () 
     }
   }, [plan]);
   if (!plan) return null;
-  const disc = plan.discipline === 'mix' ? 'Mixpass' : DISCIPLINES.find((d) => d.id === plan.discipline)!.name;
+  const disc = plan.title ?? (plan.discipline === 'mix' ? 'Mixpass' : DISCIPLINES.find((d) => d.id === plan.discipline)!.name);
   const save = () => {
     const xp = plan.minutes * 2;
     plan.dogs.forEach((d) => dispatch({ type: 'xp', dogs: [d], amount: xp + (ratings[d] ?? 3) * 5 }));
@@ -327,7 +341,7 @@ function RatingSheet({ plan, onClose }: { plan: SessionPlan | null; onClose: () 
         intensity: plan.intensity,
         ratings,
         note: note.trim() || undefined,
-        title: `${disc} ${plan.minutes} min`,
+        title: plan.title ? plan.title : `${disc} ${plan.minutes} min`,
       },
     });
     fireCelebrate();

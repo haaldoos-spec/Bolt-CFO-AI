@@ -66,6 +66,7 @@ export function mergeStates(remote: AppState, local: AppState): AppState {
     myPlaces: byId(local.myPlaces ?? [], remote.myPlaces ?? []),
     questsDone: byId(local.questsDone, remote.questsDone),
     puppyGuide: uniq(remote.puppyGuide ?? [], local.puppyGuide ?? []),
+    customPasses: byId(local.customPasses ?? [], remote.customPasses ?? []),
     dogs: {
       senior: remote.dogs.senior.customAvatar || !local.dogs.senior.customAvatar ? remote.dogs.senior : { ...remote.dogs.senior, avatar: local.dogs.senior.avatar, customAvatar: true },
       puppy: remote.dogs.puppy.customAvatar || !local.dogs.puppy.customAvatar ? remote.dogs.puppy : { ...remote.dogs.puppy, avatar: local.dogs.puppy.avatar, customAvatar: true },
