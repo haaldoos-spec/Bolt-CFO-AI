@@ -8,6 +8,7 @@ Kartan ritas sedan i appen av src/lib/osmLayer.ts (en Leaflet GridLayer), så in
 externa kartbilder behövs – det krävs inne i Claude-artefakten.
 """
 import json
+import os
 import sys
 import urllib.parse
 import urllib.request
@@ -54,7 +55,8 @@ out geom;
 
 def fetch():
     data = urllib.parse.urlencode({'data': QUERY}).encode()
-    req = urllib.request.Request('https://overpass-api.de/api/interpreter', data=data, headers={'User-Agent': 'labbeliv-map-builder'})
+    endpoint = os.environ.get('OVERPASS_URL', 'https://overpass.kumi.systems/api/interpreter')
+    req = urllib.request.Request(endpoint, data=data, headers={'User-Agent': 'labbeliv-map-builder'})
     with urllib.request.urlopen(req, timeout=300) as r:
         RAW.write_bytes(r.read())
     print('raw', RAW.stat().st_size // 1024, 'kB')
