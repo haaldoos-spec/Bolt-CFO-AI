@@ -4,18 +4,20 @@
  */
 
 /*
- * Apple Kartors länkformat (maps.apple.com/place, /search, /directions) fungerar både i
- * Kartor-appen och på webben. destination kan vara koordinater "lat,lng" eller en söktext.
+ * Apple Kartor via det klassiska länkformatet (maps.apple.com/?…), som Kartor-appen på
+ * iPhone alltid förstår. Koordinater skickas okodade ("57.79,14.28"); söktext URL-kodas.
  */
 export type TravelMode = 'driving' | 'walking';
 
-export const appleMapsSearchUrl = (query: string) => `https://maps.apple.com/search?query=${encodeURIComponent(query)}`;
+const enc = (v: string) => (/^-?\d+(\.\d+)?,-?\d+(\.\d+)?$/.test(v) ? v : encodeURIComponent(v));
+
+export const appleMapsSearchUrl = (query: string) => `https://maps.apple.com/?q=${enc(query)}`;
 
 export const appleMapsPlaceAtUrl = (lat: number, lng: number, name?: string) =>
-  `https://maps.apple.com/place?coordinate=${lat},${lng}${name ? `&name=${encodeURIComponent(name)}` : ''}`;
+  `https://maps.apple.com/?ll=${lat},${lng}&q=${encodeURIComponent(name ?? 'Plats')}`;
 
 export const appleMapsDirectionsUrl = (destination: string, mode: TravelMode = 'driving') =>
-  `https://maps.apple.com/directions?destination=${encodeURIComponent(destination)}&mode=${mode}`;
+  `https://maps.apple.com/?daddr=${enc(destination)}&dirflg=${mode === 'walking' ? 'w' : 'd'}`;
 
 export const googleMapsPlaceUrl = (name: string, town = 'Huskvarna') =>
   `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(name.includes(town) ? name : `${name}, ${town}`)}`;
