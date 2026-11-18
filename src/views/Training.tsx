@@ -5,6 +5,7 @@ import { useApp } from '../store/AppContext';
 import { DISCIPLINES, EQUIPMENT, EXERCISES, LEVEL_LABEL, disciplineById, exerciseById } from '../data/training';
 import { dogsOf } from '../data/profiles';
 import { disciplineProgress } from '../lib/coach';
+import { PuppyGuideCard } from '../components/PuppyGuide';
 import { Avatar, EQUIP_ICONS, ICONS, Progress, SectionTitle, Sheet } from '../components/ui';
 
 const LEVEL_ICON: Record<ExerciseLevel, typeof Puzzle> = { byggsten: Puzzle, kedja: Link2, program: Trophy };
@@ -264,6 +265,7 @@ export function Training() {
         <DisciplineDetail id={disc} onBack={() => setDisc(null)} onOpen={setOpen} />
       ) : (
         <div className="animate-rise">
+          {profile === 'puppy' && <div className="mb-3"><PuppyGuideCard /></div>}
           <button onClick={() => openGenerator({})} className="glass relative flex w-full items-center gap-4 overflow-hidden p-5 text-left transition active:scale-[.98]">
             <div className="pointer-events-none absolute inset-0 animate-shimmer opacity-20" style={{ backgroundImage: 'linear-gradient(110deg,transparent 30%,var(--a1) 50%,transparent 70%)', backgroundSize: '200% 100%' }} />
             <div className="relative grid h-14 w-14 place-items-center rounded-2xl text-ink" style={{ background: 'linear-gradient(135deg,var(--a1),var(--a2))' }}>

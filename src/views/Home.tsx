@@ -8,6 +8,7 @@ import { generateInsights } from '../lib/coach';
 import { isToday, levelInfo } from '../lib/xp';
 import { Avatar, Progress, SectionTitle } from '../components/ui';
 import { DISCIPLINES } from '../data/training';
+import { PuppyGuideCard } from '../components/PuppyGuide';
 
 function useTypewriter(text: string, speed = 14) {
   const [out, setOut] = useState('');
@@ -211,6 +212,7 @@ export function Home() {
   return (
     <div className="space-y-4">
       <div className="animate-rise"><CoachCard /></div>
+      {profile === 'puppy' && <div className="animate-rise [animation-delay:60ms]"><PuppyGuideCard /></div>}
       <div className="animate-rise [animation-delay:80ms]"><QuestCard /></div>
 
       <button onClick={() => openGenerator({})} className="glass flex w-full animate-rise items-center gap-4 p-4 text-left transition active:scale-[.98] [animation-delay:140ms]">

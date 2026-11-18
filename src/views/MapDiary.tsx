@@ -20,9 +20,14 @@ function OsmBase() {
   useEffect(() => {
     const data = osmData as unknown as OsmData;
     // Utan inbakad data (innan scripts/osm/build_map.py körts) används vanliga kartbilder
-    const layer = Object.keys(data.layers).length
+    const hasData = Object.keys(data.layers).length > 0;
+    const inArtifact = import.meta.env.VITE_ARTIFACT === '1';
+    if (!hasData && inArtifact) map.getContainer().classList.add('map-offline');
+    const layer = hasData
       ? createOsmLayer(data).addTo(map)
-      : L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { attribution: '© OpenStreetMap © CARTO' }).addTo(map);
+      : inArtifact
+        ? L.layerGroup().addTo(map)
+        : L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { attribution: '© OpenStreetMap © CARTO' }).addTo(map);
     const labels = L.layerGroup(
       data.labels.map(([name, lat, lng, kind]) =>
         L.marker([lat, lng], {

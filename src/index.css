@@ -113,3 +113,10 @@ html.artifact .app-header { padding-top: 14px; }
 .zoom-ge-13 .osm-label.k-suburb span, .zoom-ge-13 .osm-label.k-village span, .zoom-ge-13 .osm-label.k-dog_park span { display: block; }
 .zoom-ge-15 .osm-label.k-neighbourhood span, .zoom-ge-15 .osm-label.k-quarter span, .zoom-ge-15 .osm-label.k-hamlet span, .zoom-ge-15 .osm-label.k-locality span { display: block; }
 .zoom-ge-13 .osm-label.k-town span, .zoom-ge-13 .osm-label.k-city span { opacity: .5; }
+/* Reserv när kartdata saknas i artefakten */
+.leaflet-container.map-offline {
+  background:
+    linear-gradient(rgba(255,255,255,.045) 1px, transparent 1px) 0 0 / 40px 40px,
+    linear-gradient(90deg, rgba(255,255,255,.045) 1px, transparent 1px) 0 0 / 40px 40px,
+    #0b0d14;
+}

@@ -13,6 +13,7 @@ type Action =
   | { type: 'deleteCheckin'; id: string }
   | { type: 'addPlace'; place: Place }
   | { type: 'deletePlace'; id: string }
+  | { type: 'toggleGuide'; id: string }
   | { type: 'questDone'; questId: string; profile: ProfileId }
   | { type: 'updateDog'; dog: DogId; patch: Partial<DogInfo> }
   | { type: 'reset' };
@@ -45,6 +46,14 @@ function reducer(s: AppState, a: Action): AppState {
       return { ...s, myPlaces: [a.place, ...s.myPlaces] };
     case 'deletePlace':
       return { ...s, myPlaces: s.myPlaces.filter((p) => p.id !== a.id) };
+    case 'toggleGuide': {
+      const has = s.puppyGuide.includes(a.id);
+      return {
+        ...s,
+        puppyGuide: has ? s.puppyGuide.filter((x) => x !== a.id) : [...s.puppyGuide, a.id],
+        xp: { ...s.xp, puppy: Math.max(0, s.xp.puppy + (has ? -10 : 10)) },
+      };
+    }
     case 'questDone':
       return { ...s, questsDone: [{ id: crypto.randomUUID(), questId: a.questId, profile: a.profile, date: new Date().toISOString() }, ...s.questsDone] };
     case 'updateDog':
@@ -64,6 +73,7 @@ const load = (): AppState => {
         if (!s.dogs[d].customAvatar) s.dogs[d].avatar = DEFAULT_DOGS[d].avatar;
       });
       s.myPlaces ??= [];
+      s.puppyGuide ??= [];
       // Demominnen följer med när demoplatserna byts (t.ex. till Jönköping/Huskvarna)
       const seedCheckins = seedState().checkins;
       s.checkins = s.checkins.map((c) => { const seed = seedCheckins.find((x) => x.id === c.id); return seed ? { ...seed, date: c.date } : c; });

@@ -115,5 +115,7 @@ export interface AppState {
   sessions: SessionRecord[];
   checkins: CheckIn[];
   myPlaces: Place[];
+  /** Avbockade punkter i guiden Första tiden med valpen */
+  puppyGuide: string[];
   questsDone: { id: string; questId: string; date: string; profile: ProfileId }[];
 }
