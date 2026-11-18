@@ -5,7 +5,7 @@ import 'leaflet/dist/leaflet.css';
 import { Camera, Check, ImagePlus, LocateFixed, MapPin, Navigation, Plus, Trash2 } from 'lucide-react';
 import type { CheckIn, DogId, Place, PlaceCategory } from '../types';
 import { useApp } from '../store/AppContext';
-import { DEFAULT_CENTER, HOME_LABEL, PLACES, PLACE_CATS, distanceKm } from '../data/places';
+import { DEFAULT_CENTER, DEFAULT_ZOOM, HOME_LABEL, PLACES, PLACE_CATS, distanceKm } from '../data/places';
 import { dogsOf } from '../data/profiles';
 import { Avatar, ICONS, SectionTitle, Sheet } from '../components/ui';
 
@@ -33,10 +33,10 @@ const photoIcon = (c: CheckIn) =>
 /** Döljer platsnamnen när man zoomat ut, så de inte krockar */
 function LabelToggle() {
   const map = useMapEvents({
-    zoomend: () => map.getContainer().classList.toggle('labels-hidden', map.getZoom() < 12.5),
+    zoomend: () => map.getContainer().classList.toggle('labels-hidden', map.getZoom() < 12.25),
   });
   useEffect(() => {
-    map.getContainer().classList.toggle('labels-hidden', map.getZoom() < 12.5);
+    map.getContainer().classList.toggle('labels-hidden', map.getZoom() < 12.25);
   }, [map]);
   return null;
 }
@@ -207,8 +207,8 @@ export function MapDiary() {
 
   const places = PLACES.filter((p) => !filters.length || filters.includes(p.category));
   const nearby = useMemo(() => {
-    if (!userPos) return [];
-    return places.map((p) => ({ p, d: distanceKm(userPos, [p.lat, p.lng]) })).sort((a, b) => a.d - b.d).slice(0, 4);
+    const from = userPos ?? DEFAULT_CENTER;
+    return places.map((p) => ({ p, d: distanceKm(from, [p.lat, p.lng]) })).sort((a, b) => a.d - b.d).slice(0, userPos ? 4 : 6);
   }, [userPos, places]);
 
   const flyTo = (pos: [number, number], zoom = 14) => {
@@ -219,8 +219,7 @@ export function MapDiary() {
   const locate = () => {
     if (!navigator.geolocation) {
       toast(`Platstjänster saknas – visar ${HOME_LABEL}`);
-      setUserPos(DEFAULT_CENTER);
-      flyTo(DEFAULT_CENTER, 11);
+      flyTo(DEFAULT_CENTER, DEFAULT_ZOOM);
       return;
     }
     setLocating(true);
@@ -233,8 +232,7 @@ export function MapDiary() {
       },
       () => {
         setLocating(false);
-        setUserPos(DEFAULT_CENTER);
-        flyTo(DEFAULT_CENTER, 11);
+        flyTo(DEFAULT_CENTER, DEFAULT_ZOOM);
         toast(`Visar äventyr runt ${HOME_LABEL}`);
       },
       { enableHighAccuracy: true, timeout: 8000 },
@@ -269,7 +267,7 @@ export function MapDiary() {
       </div>
 
       <div ref={mapRef} className="glass relative h-[52vh] min-h-[340px] overflow-hidden !rounded-[28px] p-0">
-        <MapContainer center={DEFAULT_CENTER} zoom={11} zoomSnap={0.5} className={`h-full w-full ${OFFLINE_MAP ? 'map-offline' : ''}`} attributionControl={!OFFLINE_MAP}>
+        <MapContainer center={DEFAULT_CENTER} zoom={DEFAULT_ZOOM} zoomSnap={0.5} className={`h-full w-full ${OFFLINE_MAP ? 'map-offline' : ''}`} attributionControl={!OFFLINE_MAP}>
           {!OFFLINE_MAP && (
             <TileLayer
               url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
@@ -306,7 +304,7 @@ export function MapDiary() {
 
       {nearby.length > 0 && (
         <>
-          <SectionTitle kicker="Nära dig" title="Äventyr i närheten" />
+          <SectionTitle kicker={userPos && userPos !== DEFAULT_CENTER ? 'Nära dig' : 'Hemmabasen'} title={userPos && userPos !== DEFAULT_CENTER ? 'Äventyr i närheten' : `Äventyr i ${HOME_LABEL}`} />
           <div className="space-y-2">
             {nearby.map(({ p, d }) => (
               <button key={p.id} onClick={() => { flyTo([p.lat, p.lng], 14); setPlaceOpen(p); }} className="glass flex w-full items-center gap-3 p-3.5 text-left active:scale-[.98]">

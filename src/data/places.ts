@@ -7,12 +7,17 @@ export const PLACE_CATS: Record<PlaceCategory, { label: string; color: string; i
   vatten: { label: 'Vatten & Apportering', color: '#67e8f9', icon: 'Waves' },
 };
 
-/** Mitt emellan Jönköping och Huskvarna */
-export const DEFAULT_CENTER: [number, number] = [57.7700, 14.2050];
-export const HOME_LABEL = 'Jönköping/Huskvarna';
+/** Huskvarna är hemmabasen – Jönköping ligger en bit västerut */
+export const DEFAULT_CENTER: [number, number] = [57.7900, 14.2800];
+export const DEFAULT_ZOOM = 12.5;
+export const HOME_LABEL = 'Huskvarna';
 
 // Koordinaterna är ungefärliga – kolla alltid lokala regler för koppeltvång och hundbad.
 export const PLACES: Place[] = [
+  // ── Huskvarna ──
+  { id: 'p-oxnehaga', name: 'Öxnehaga skogsområde', category: 'skog', lat: 57.7860, lng: 14.3130, description: 'Skogsklädda höjder öster om Huskvarna med stigar och mossa. Nära hemmet – perfekt för vardagsspår och sniffari.', goodFor: ['Spår', 'Sniffari', 'Sök'], seniorFriendly: true, puppyFriendly: true },
+  { id: 'p-folketspark', name: 'Folkets park Huskvarna', category: 'balans', lat: 57.7905, lng: 14.2865, description: 'Parken uppe på berget med utsikt över Vättern, stenar, trappor och gräsytor. Kroppskontroll och miljöträning.', goodFor: ['Klätterklossen', 'Utsikt', 'Passivitet'], seniorFriendly: true, puppyFriendly: true },
+  { id: 'p-lillsjon', name: 'Lillsjön', category: 'vatten', lat: 57.7980, lng: 14.2480, description: 'Mindre sjö med lugnare vatten än Vättern. Bra för skonsam simning och vattenstadga – kolla var hundar får bada.', goodFor: ['Simning', 'Vattenstadga', 'Apport'], seniorFriendly: true, puppyFriendly: true },
   { id: 'p-bymarken', name: 'Bymarken', category: 'skog', lat: 57.7745, lng: 14.1180, description: 'Stort friluftsområde i västra Jönköping med motionsspår och barrskog. Perfekt för spår och sniffari.', goodFor: ['Spår', 'Sniffari', 'Långlina'], seniorFriendly: true, puppyFriendly: true },
   { id: 'p-stromsberg', name: 'Strömsbergs friluftsområde', category: 'skog', lat: 57.7690, lng: 14.2010, description: 'Skog och elljusspår mellan Jönköping och Huskvarna. Bra för spår på morgonen och kvällspromenader.', goodFor: ['Spår', 'Nosarbete', 'Inkallning'], seniorFriendly: true, puppyFriendly: true },
   { id: 'p-dunkehallar', name: 'Dunkehallar', category: 'skog', lat: 57.7740, lng: 14.1450, description: 'Naturreservat med bäckravin, lövskog och smala stigar. Mycket dofter – och mycket att balansera på.', goodFor: ['Sök', 'Balans', 'Spår'], seniorFriendly: false, puppyFriendly: true },
