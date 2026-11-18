@@ -2,7 +2,11 @@
 Bygger appens inbyggda karta från OpenStreetMap-data (© OpenStreetMap-bidragsgivare, ODbL).
 
   python3 scripts/osm/build_map.py fetch   # hämtar rådata från Overpass till scripts/osm/raw.json
+  python3 scripts/osm/build_map.py frompbf omrade.osm.pbf   # alternativ: läs en nedladdad/utklippt .pbf
   python3 scripts/osm/build_map.py build   # skriver src/data/osm-map.json
+
+Utklipp ur Geofabriks Sverigefil (kräver osmium-tool):
+  osmium extract -b 14.080,57.735,14.345,57.830 --strategy smart sweden-latest.osm.pbf -o omrade.osm.pbf
 
 Kartan ritas sedan i appen av src/lib/osmLayer.ts (en Leaflet GridLayer), så inga
 externa kartbilder behövs – det krävs inne i Claude-artefakten.
@@ -60,6 +64,58 @@ def fetch():
     with urllib.request.urlopen(req, timeout=300) as r:
         RAW.write_bytes(r.read())
     print('raw', RAW.stat().st_size // 1024, 'kB')
+
+
+def in_box(lat, lon, b):
+    return b[0] <= lat <= b[2] and b[1] <= lon <= b[3]
+
+
+MAJOR_HW = {'motorway', 'trunk', 'primary', 'secondary', 'tertiary', 'motorway_link', 'trunk_link', 'primary_link', 'secondary_link'}
+
+
+def frompbf(path):
+    """Läser en .osm.pbf och skriver raw.json i samma form som Overpass `out geom`."""
+    import osmium
+
+    ways = {}
+    rels = []
+    nodes = []
+
+    class H(osmium.SimpleHandler):
+        def node(self, n):
+            t = dict(n.tags)
+            if ('place' in t or t.get('leisure') == 'dog_park') and n.location.valid() and in_box(n.location.lat, n.location.lon, WIDE):
+                nodes.append({'type': 'node', 'id': n.id, 'lat': n.location.lat, 'lon': n.location.lon, 'tags': t})
+
+        def way(self, w):
+            try:
+                geom = [{'lat': nd.location.lat, 'lon': nd.location.lon} for nd in w.nodes]
+            except osmium.InvalidLocationError:
+                return
+            ways[w.id] = (dict(w.tags), geom)
+
+        def relation(self, r):
+            t = dict(r.tags)
+            if t.get('type') == 'multipolygon' and classify(t):
+                rels.append((r.id, t, [(m.ref, m.role) for m in r.members if m.type == 'w']))
+
+    H().apply_file(path, locations=True, idx='flex_mem')
+
+    els = list(nodes)
+    for wid, (t, geom) in ways.items():
+        if not t or not classify(t):
+            continue
+        hw = t.get('highway')
+        box_ = DETAIL if (t.get('building') or (hw and hw not in MAJOR_HW)) else WIDE
+        if not any(in_box(p['lat'], p['lon'], box_) for p in geom):
+            continue
+        els.append({'type': 'way', 'id': wid, 'tags': t, 'geometry': geom})
+    for rid, t, members in rels:
+        mem = [{'type': 'way', 'ref': ref, 'role': role, 'geometry': ways[ref][1]} for ref, role in members if ref in ways]
+        if mem:
+            els.append({'type': 'relation', 'id': rid, 'tags': t, 'members': mem})
+    RAW.write_text(json.dumps({'elements': els}))
+    print('raw', RAW.stat().st_size // 1024, 'kB', len(els), 'element')
 
 
 def classify(t):
@@ -232,4 +288,8 @@ def build():
 
 
 if __name__ == '__main__':
-    {'fetch': fetch, 'build': build}[sys.argv[1]]()
+    cmd = sys.argv[1]
+    if cmd == 'frompbf':
+        frompbf(sys.argv[2])
+    else:
+        {'fetch': fetch, 'build': build}[cmd]()
