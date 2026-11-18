@@ -53,9 +53,9 @@ const load = (): AppState => {
     const raw = localStorage.getItem(KEY);
     if (raw) {
       const s = JSON.parse(raw) as AppState;
-      // Inbyggda avatarer (sökvägar i /avatars) följer alltid med senaste versionen; egna uppladdningar behålls
+      // Inbyggda avatarer följer alltid med senaste versionen; egna uppladdningar behålls
       (Object.keys(s.dogs) as DogId[]).forEach((d) => {
-        if (s.dogs[d].avatar.startsWith('/avatars/')) s.dogs[d].avatar = DEFAULT_DOGS[d].avatar;
+        if (!s.dogs[d].customAvatar) s.dogs[d].avatar = DEFAULT_DOGS[d].avatar;
       });
       return s;
     }

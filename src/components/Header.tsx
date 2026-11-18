@@ -20,7 +20,7 @@ export function Header() {
       : `${state.dogs[profile].name} · ${state.dogs[profile].ageLabel}`;
 
   return (
-    <header className="px-4 pt-[calc(env(safe-area-inset-top)+14px)]">
+    <header className="app-header px-4 pt-[calc(env(safe-area-inset-top)+14px)]">
       <div className="mb-4 flex items-center justify-between px-1">
         <div>
           <div className="label">{greet}</div>

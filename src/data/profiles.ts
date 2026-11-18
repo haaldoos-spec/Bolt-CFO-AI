@@ -1,4 +1,6 @@
 import type { DogId, DogInfo, ProfileId } from '../types';
+import seniorAvatar from '../assets/senior.jpg';
+import puppyAvatar from '../assets/puppy.jpg';
 
 export interface ThemeDef {
   a1: string;
@@ -51,9 +53,8 @@ export const PROFILE_META: Record<ProfileId, { label: string; short: string; foc
 };
 
 /**
- * Byt ut avatarerna genom att lägga dina egna 3D-bilder i /public/avatars
- * (t.ex. senior.png & puppy.png) och ändra sökvägen här – eller ladda upp
- * direkt i appen under Profil & Statistik.
+ * Avatarerna ligger i src/assets (senior.jpg & puppy.jpg). Byt filerna för nya
+ * standardbilder – eller ladda upp direkt i appen under Profil & Statistik.
  */
 export const DEFAULT_DOGS: Record<DogId, DogInfo> = {
   senior: {
@@ -62,7 +63,7 @@ export const DEFAULT_DOGS: Record<DogId, DogInfo> = {
     breedLabel: 'Svart labrador',
     ageLabel: '9 år',
     birth: '2017-09-02',
-    avatar: '/avatars/senior.jpg',
+    avatar: seniorAvatar,
     weightKg: 32,
   },
   puppy: {
@@ -71,7 +72,7 @@ export const DEFAULT_DOGS: Record<DogId, DogInfo> = {
     breedLabel: 'Gul labrador',
     ageLabel: '5 mån',
     birth: '2026-06-10',
-    avatar: '/avatars/puppy.jpg',
+    avatar: puppyAvatar,
     weightKg: 17,
   },
 };

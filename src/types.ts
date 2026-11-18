@@ -100,6 +100,8 @@ export interface DogInfo {
   ageLabel: string;
   birth: string;
   avatar: string; // url eller dataURL
+  /** true när ägaren laddat upp en egen bild i appen */
+  customAvatar?: boolean;
   weightKg: number;
 }
 

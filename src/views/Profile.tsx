@@ -53,7 +53,7 @@ function DogCard({ dog }: { dog: DogId }) {
             className="hidden"
             onChange={async (e) => {
               const f = e.target.files?.[0];
-              if (f) dispatch({ type: 'updateDog', dog, patch: { avatar: await readAvatar(f) } });
+              if (f) dispatch({ type: 'updateDog', dog, patch: { avatar: await readAvatar(f), customAvatar: true } });
               e.target.value = '';
             }}
           />
@@ -168,6 +168,7 @@ function WeekChart() {
 export function Profile() {
   const { state, profile, dispatch, toast } = useApp();
   const dogs = dogsOf(profile);
+  const [confirmReset, setConfirmReset] = useState(false);
 
   return (
     <div className="animate-rise space-y-4">
@@ -235,14 +236,18 @@ export function Profile() {
 
       <button
         onClick={() => {
-          if (confirm('Återställ all data till demo-läget?')) {
+          if (confirmReset) {
             dispatch({ type: 'reset' });
             toast('Demodata återställd');
+            setConfirmReset(false);
+          } else {
+            setConfirmReset(true);
+            setTimeout(() => setConfirmReset(false), 4000);
           }
         }}
-        className="btn-ghost mx-auto mt-6 flex !text-xs !text-white/50"
+        className={`btn-ghost mx-auto mt-6 flex !text-xs ${confirmReset ? '!border-rose-300/50 !text-rose-200' : '!text-white/50'}`}
       >
-        <RotateCcw size={14} /> Återställ demodata
+        <RotateCcw size={14} /> {confirmReset ? 'Tryck igen för att radera allt' : 'Återställ demodata'}
       </button>
     </div>
   );

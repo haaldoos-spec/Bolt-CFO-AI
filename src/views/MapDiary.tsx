@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { MapContainer, Marker, TileLayer, useMap } from 'react-leaflet';
+import { MapContainer, Marker, TileLayer, Tooltip, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { Camera, Check, ImagePlus, LocateFixed, MapPin, Navigation, Plus, Trash2 } from 'lucide-react';
@@ -8,6 +8,9 @@ import { useApp } from '../store/AppContext';
 import { DEFAULT_CENTER, PLACES, PLACE_CATS, distanceKm } from '../data/places';
 import { dogsOf } from '../data/profiles';
 import { Avatar, ICONS, SectionTitle, Sheet } from '../components/ui';
+
+/** I Claude-artefakten blockeras externa kartbilder – då visas en stiliserad karta */
+const OFFLINE_MAP = import.meta.env.VITE_ARTIFACT === '1';
 
 const CAT_EMOJI: Record<PlaceCategory, string> = { skog: '🌲', balans: '🪨', cafe: '☕', vatten: '🌊' };
 
@@ -253,14 +256,22 @@ export function MapDiary() {
       </div>
 
       <div ref={mapRef} className="glass relative h-[52vh] min-h-[340px] overflow-hidden !rounded-[28px] p-0">
-        <MapContainer center={DEFAULT_CENTER} zoom={11} className="h-full w-full" attributionControl>
-          <TileLayer
-            url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/">CARTO</a>'
-          />
+        <MapContainer center={DEFAULT_CENTER} zoom={11} className={`h-full w-full ${OFFLINE_MAP ? 'map-offline' : ''}`} attributionControl={!OFFLINE_MAP}>
+          {!OFFLINE_MAP && (
+            <TileLayer
+              url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/">CARTO</a>'
+            />
+          )}
           <FlyTo target={fly} />
           {places.map((p) => (
-            <Marker key={p.id} position={[p.lat, p.lng]} icon={placeIcon(p)} eventHandlers={{ click: () => setPlaceOpen(p) }} />
+            <Marker key={p.id} position={[p.lat, p.lng]} icon={placeIcon(p)} eventHandlers={{ click: () => setPlaceOpen(p) }}>
+              {OFFLINE_MAP && (
+                <Tooltip permanent direction="bottom" offset={[0, 4]} className="place-label">
+                  {p.name.split(' – ')[0]}
+                </Tooltip>
+              )}
+            </Marker>
           ))}
           {state.checkins.map((c) => (
             <Marker key={c.id} position={[c.lat, c.lng]} icon={photoIcon(c)} zIndexOffset={500} eventHandlers={{ click: () => setMemory(c) }} />
@@ -359,6 +370,14 @@ export function MapDiary() {
               </>
             )}
             <button onClick={() => { const p = placeOpen; setPlaceOpen(null); setCheckin({ place: p }); }} className="btn-accent w-full"><Camera size={18} /> Checka in här</button>
+            <a
+              href={`https://maps.apple.com/?q=${encodeURIComponent(placeOpen.name)}&ll=${placeOpen.lat},${placeOpen.lng}`}
+              target="_blank"
+              rel="noreferrer"
+              className="btn-ghost mt-2 w-full"
+            >
+              <Navigation size={16} /> Vägbeskrivning i Kartor
+            </a>
           </>
         )}
       </Sheet>
