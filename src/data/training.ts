@@ -90,10 +90,15 @@ export const DISCIPLINES: Discipline[] = [
   {
     id: 'agility', name: 'Agility', tagline: 'Valpanpassat – marknivå & kroppskontroll', goalLabel: 'Valpbana (hoppfri)', icon: 'Zap',
     rules: {
-      org: 'Svenska Agilityklubben (SAgiK) / SKK', period: 'Regler 2022–2026', official: true,
+      org: 'Svenska Agilityklubben (SAgiK) – Regler för agilitytävlingar', period: 'Gäller 2022–2026 (nya regler 2027–2031)', official: true,
       facts: [
-        'Hunden får tävla först när den fyllt 18 månader.',
-        'Officiell mätning för storleksklass görs tidigast vid 18 månader och slutgiltigt före start efter 24 månader.',
+        'Hunden ska ha fyllt 18 månader senast tävlingsdagen.',
+        'Mankhöjden mäts av en agilitydomare tidigast vid 18 månader och slutgiltigt före start efter 24 månader.',
+        'Storleksgrupper: XS, S, M, L (43–under 50 cm) och XL. En labrador hamnar oftast i extra large (från 43 cm i dag, från 48 cm med 2027 års regler).',
+        'Hopphöjd för extra large: 50–55 cm i klass 1 och 50–60 cm i klass 2–3. För large: 40–45 cm i klass 1.',
+        'Två grenar: agilityklass (med A-hinder, balansbom och gungbräda) och hoppklass (utan kontaktfältshinder). Klass 1–3.',
+        'Uppflyttning: tre felfria lopp bland de 15 % bästa i klass 1. Fem uppflyttningsresultat ger diplom (AgD 1 / AgHD 1).',
+        'Godis eller leksak på banan – eller att avbryta för att klappa hunden – ger diskvalificering.',
         'Banorna i appen är inte tävlingsbanor – de är valpanpassade förberedelser utan hopp.',
       ],
     },
