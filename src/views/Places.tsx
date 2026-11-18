@@ -4,19 +4,24 @@ import type { CheckIn, DogId, Place, PlaceCategory } from '../types';
 import { useApp } from '../store/AppContext';
 import { DEFAULT_CENTER, HOME_LABEL, PLACES, PLACE_CATS, distanceKm } from '../data/places';
 import { dogsOf } from '../data/profiles';
-import { appleMapsDirectionsToCoords, appleMapsDirectionsUrl, appleMapsPlaceUrl, googleMapsPlaceUrl, parseMapsLink, type ParsedMapsLink } from '../lib/maps';
+import { appleMapsDirectionsUrl, appleMapsPlaceAtUrl, appleMapsSearchUrl, googleMapsPlaceUrl, parseMapsLink, type ParsedMapsLink, type TravelMode } from '../lib/maps';
 import { Avatar, ICONS, SectionTitle, Sheet } from '../components/ui';
 
 const CAT_EMOJI: Record<PlaceCategory, string> = { skog: '🌲', balans: '🪨', cafe: '☕', vatten: '🌊' };
 
-/** Visa platsen i Apple Kartor */
-const mapsLinkFor = (p: Place) => p.mapsUrl ?? appleMapsPlaceUrl(p.name, p.lat, p.lng);
+/** Söktext för platser utan exakt position */
+const queryFor = (p: Place) => p.mapsQuery ?? `${p.name}, ${HOME_LABEL}`;
 
-/** Vägbeskrivning dit – det som öppnas när man trycker på en plats */
-const directionsFor = (p: Place, mode: 'd' | 'w' = 'd') => {
-  if (p.custom) return p.noCoords ? (p.mapsUrl ?? mapsLinkFor(p)) : appleMapsDirectionsToCoords(p.lat, p.lng, mode);
-  return appleMapsDirectionsUrl(p.name, p.lat, p.lng, mode);
+/** Visa platsen i Apple Kartor */
+const mapsLinkFor = (p: Place) => {
+  if (p.custom) return p.noCoords ? (p.mapsUrl ?? appleMapsSearchUrl(queryFor(p))) : appleMapsPlaceAtUrl(p.lat, p.lng, p.name);
+  return appleMapsSearchUrl(queryFor(p));
 };
+
+/** Vägbeskrivning dit – det som öppnas när man trycker på en plats.
+ *  Egna platser: exakt position. Tips-platser: söktext, så Kartor hittar rätt ställe. */
+const directionsFor = (p: Place, mode: TravelMode = 'driving') =>
+  appleMapsDirectionsUrl(p.custom && !p.noCoords ? `${p.lat},${p.lng}` : p.custom ? p.name : queryFor(p), mode);
 
 const distText = (p: Place) => {
   if (p.noCoords) return null;
@@ -125,7 +130,7 @@ function AddFromMaps({ onSaved }: { onSaved: (p: Place) => void }) {
       lat: hasCoords ? parsed!.lat! : DEFAULT_CENTER[0],
       lng: hasCoords ? parsed!.lng! : DEFAULT_CENTER[1],
       noCoords: !hasCoords,
-      mapsUrl: parsed?.url ?? `https://maps.apple.com/?q=${encodeURIComponent(`${finalName}, ${HOME_LABEL}`)}`,
+      mapsUrl: parsed?.url,
       description: note.trim(),
       goodFor: [],
       seniorFriendly: profile !== 'puppy',
@@ -365,7 +370,7 @@ export function Places() {
       </div>
 
       <div className="grid grid-cols-2 gap-2">
-        <a href={`https://maps.apple.com/?ll=${DEFAULT_CENTER[0]},${DEFAULT_CENTER[1]}&z=13`} target="_blank" rel="noreferrer" className="btn-ghost !justify-start !py-3.5">
+        <a href={appleMapsPlaceAtUrl(DEFAULT_CENTER[0], DEFAULT_CENTER[1], HOME_LABEL)} target="_blank" rel="noreferrer" className="btn-ghost !justify-start !py-3.5">
           <MapIcon size={18} className="text-[var(--a1)]" /> Öppna Kartor
         </a>
         <button onClick={() => setCheckin({})} className="btn-accent !justify-start !py-3.5">
@@ -464,18 +469,18 @@ export function Places() {
               </>
             )}
             <div className="space-y-2">
-              <a href={directionsFor(placeOpen, 'd')} target="_blank" rel="noreferrer" className="btn-accent w-full">
+              <a href={directionsFor(placeOpen, 'driving')} target="_blank" rel="noreferrer" className="btn-accent w-full">
                 <Navigation size={18} /> Vägbeskrivning med bil
               </a>
-              {!placeOpen.noCoords && (
-                <a href={directionsFor(placeOpen, 'w')} target="_blank" rel="noreferrer" className="btn-ghost w-full">
+              {(
+                <a href={directionsFor(placeOpen, 'walking')} target="_blank" rel="noreferrer" className="btn-ghost w-full">
                   <Navigation size={16} /> Vägbeskrivning till fots
                 </a>
               )}
               <a href={mapsLinkFor(placeOpen)} target="_blank" rel="noreferrer" className="btn-ghost w-full">
                 <MapIcon size={16} /> Visa platsen i Apple Kartor
               </a>
-              <a href={placeOpen.mapsUrl?.includes('google') ? placeOpen.mapsUrl : googleMapsPlaceUrl(placeOpen.name, HOME_LABEL)} target="_blank" rel="noreferrer" className="btn-ghost w-full">
+              <a href={placeOpen.mapsUrl?.includes('google') ? placeOpen.mapsUrl : googleMapsPlaceUrl(queryFor(placeOpen), '')} target="_blank" rel="noreferrer" className="btn-ghost w-full">
                 <MapIcon size={16} /> Google Maps
               </a>
               <button onClick={() => { const p = placeOpen; setPlaceOpen(null); setCheckin({ place: p }); }} className="btn-ghost w-full">

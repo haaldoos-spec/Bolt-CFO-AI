@@ -3,17 +3,19 @@
  * (Apple Kartor: Dela → Kopiera, Google Maps: Dela → Kopiera länk).
  */
 
-/** Öppnar en plats i Apple Kartor: söker på namnet nära koordinaten, så kartappen hittar rätt ställe */
-export const appleMapsPlaceUrl = (name: string, lat: number, lng: number) =>
-  `https://maps.apple.com/?q=${encodeURIComponent(name)}&sll=${lat},${lng}&z=15`;
+/*
+ * Apple Kartors länkformat (maps.apple.com/place, /search, /directions) fungerar både i
+ * Kartor-appen och på webben. destination kan vara koordinater "lat,lng" eller en söktext.
+ */
+export type TravelMode = 'driving' | 'walking';
 
-/** Vägbeskrivning i Apple Kartor. mode: d = bil, w = gång */
-export const appleMapsDirectionsUrl = (name: string, lat: number, lng: number, mode: 'd' | 'w' = 'd') =>
-  `https://maps.apple.com/?daddr=${encodeURIComponent(name)}&sll=${lat},${lng}&dirflg=${mode}`;
+export const appleMapsSearchUrl = (query: string) => `https://maps.apple.com/search?query=${encodeURIComponent(query)}`;
 
-/** Vägbeskrivning till exakta koordinater (egna sparade platser) */
-export const appleMapsDirectionsToCoords = (lat: number, lng: number, mode: 'd' | 'w' = 'd') =>
-  `https://maps.apple.com/?daddr=${lat},${lng}&dirflg=${mode}`;
+export const appleMapsPlaceAtUrl = (lat: number, lng: number, name?: string) =>
+  `https://maps.apple.com/place?coordinate=${lat},${lng}${name ? `&name=${encodeURIComponent(name)}` : ''}`;
+
+export const appleMapsDirectionsUrl = (destination: string, mode: TravelMode = 'driving') =>
+  `https://maps.apple.com/directions?destination=${encodeURIComponent(destination)}&mode=${mode}`;
 
 export const googleMapsPlaceUrl = (name: string, town = 'Huskvarna') =>
   `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(name.includes(town) ? name : `${name}, ${town}`)}`;

@@ -74,6 +74,8 @@ export interface Place {
   custom?: boolean;
   /** Länk till platsen i Apple Kartor / Google Maps (inklistrad) */
   mapsUrl?: string;
+  /** Söktext för kartappen, t.ex. 'Bymarken, Jönköping' */
+  mapsQuery?: string;
   /** Saknar koordinater (t.ex. kort delningslänk) – visas utan avstånd */
   noCoords?: boolean;
   createdAt?: string;
