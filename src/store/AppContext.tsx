@@ -1,4 +1,5 @@
-import { createContext, useContext, useEffect, useMemo, useReducer, useState, type ReactNode } from 'react';
+import { createContext, useContext, useEffect, useMemo, useReducer, useRef, useState, type ReactNode } from 'react';
+import { startSync, type SyncHandle, type SyncStatus } from '../lib/sync';
 import type { AppState, CheckIn, Place, DisciplineId, DogId, DogInfo, ProfileId, SessionRecord, TabId } from '../types';
 
 export type GeneratorPreset = { discipline?: DisciplineId | 'mix'; minutes?: number };
@@ -17,7 +18,8 @@ type Action =
   | { type: 'toggleGuide'; id: string }
   | { type: 'questDone'; questId: string; profile: ProfileId }
   | { type: 'updateDog'; dog: DogId; patch: Partial<DogInfo> }
-  | { type: 'reset' };
+  | { type: 'reset' }
+  | { type: 'replace'; state: AppState };
 
 const KEY = 'labbeliv.state.v1';
 
@@ -61,14 +63,21 @@ function reducer(s: AppState, a: Action): AppState {
       return { ...s, dogs: { ...s.dogs, [a.dog]: { ...s.dogs[a.dog], ...a.patch } } };
     case 'reset':
       return seedState();
+    case 'replace':
+      return a.state;
   }
 }
 
-const load = (): AppState => {
-  try {
-    const raw = localStorage.getItem(KEY);
-    if (raw) {
-      const s = JSON.parse(raw) as AppState;
+/** Uppdaterar sparad data (lokal eller från Claudes lagring) till senaste formatet */
+export function migrate(input: AppState): AppState {
+  const s = structuredClone(input) as AppState;
+  const seedBase = seedState();
+  s.dogs ??= seedBase.dogs;
+  s.xp ??= seedBase.xp;
+  s.completed ??= seedBase.completed;
+  s.sessions ??= [];
+  s.checkins ??= [];
+  s.questsDone ??= [];
       // Inbyggda avatarer följer alltid med senaste versionen; egna uppladdningar behålls
       (Object.keys(s.dogs) as DogId[]).forEach((d) => {
         if (!s.dogs[d].customAvatar) s.dogs[d].avatar = DEFAULT_DOGS[d].avatar;
@@ -99,9 +108,13 @@ const load = (): AppState => {
         return parsed?.lat !== undefined && parsed.lng !== undefined ? { ...p, lat: parsed.lat, lng: parsed.lng, noCoords: false } : p;
       });
       s.puppyGuide ??= [];
-      // Demominnen följer med när demoplatserna byts (t.ex. till Jönköping/Huskvarna)
       return s;
-    }
+}
+
+const load = (): AppState => {
+  try {
+    const raw = localStorage.getItem(KEY);
+    if (raw) return migrate(JSON.parse(raw) as AppState);
   } catch {
     /* ignorera */
   }
@@ -124,6 +137,8 @@ interface Ctx {
   fireCelebrate: () => void;
   generator: GeneratorPreset | null;
   openGenerator: (p: GeneratorPreset | null) => void;
+  /** Om datan synkas med Claudes lagring eller bara finns på den här enheten */
+  syncStatus: SyncStatus;
 }
 
 const AppCtx = createContext<Ctx | null>(null);
@@ -142,6 +157,31 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [pendingCheckin, setPendingCheckin] = useState<Ctx['pendingCheckin']>(null);
   const [celebrate, setCelebrate] = useState(0);
   const [generator, openGenerator] = useState<GeneratorPreset | null>(null);
+  const [syncStatus, setSyncStatus] = useState<SyncStatus>('ansluter');
+  const syncRef = useRef<SyncHandle | null>(null);
+  const stateRef = useRef(state);
+  stateRef.current = state;
+
+  // Synka med Claudes lagring (privat per konto) när appen körs inne i Claude
+  useEffect(() => {
+    let alive = true;
+    startSync({
+      getLocal: () => stateRef.current,
+      onRemote: (s) => alive && dispatch({ type: 'replace', state: migrate(s) }),
+      onStatus: (st) => alive && setSyncStatus(st),
+    }).then((h) => {
+      if (alive) syncRef.current = h;
+      else h?.stop();
+    });
+    return () => {
+      alive = false;
+      syncRef.current?.stop();
+    };
+  }, []);
+
+  useEffect(() => {
+    syncRef.current?.push(state);
+  }, [state]);
 
   useEffect(() => {
     try {
@@ -193,8 +233,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
       fireCelebrate: () => setCelebrate((c) => c + 1),
       generator,
       openGenerator,
+      syncStatus,
     }),
-    [state, profile, tab, toastMsg, pendingCheckin, celebrate, generator],
+    [state, profile, tab, toastMsg, pendingCheckin, celebrate, generator, syncStatus],
   );
 
   return <AppCtx.Provider value={value}>{children}</AppCtx.Provider>;

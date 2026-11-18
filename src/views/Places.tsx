@@ -39,7 +39,7 @@ const distText = (p: Place) => {
   return d < 10 ? `${d.toFixed(1)} km` : `${Math.round(d)} km`;
 };
 
-const downscale = (file: File, max = 720): Promise<string> =>
+const downscale = (file: File, max = 640): Promise<string> =>
   new Promise((resolve, reject) => {
     const img = new Image();
     const url = URL.createObjectURL(file);
@@ -50,7 +50,7 @@ const downscale = (file: File, max = 720): Promise<string> =>
       c.height = Math.round(img.height * s);
       c.getContext('2d')!.drawImage(img, 0, 0, c.width, c.height);
       URL.revokeObjectURL(url);
-      resolve(c.toDataURL('image/jpeg', 0.78));
+      resolve(c.toDataURL('image/jpeg', 0.74));
     };
     img.onerror = reject;
     img.src = url;

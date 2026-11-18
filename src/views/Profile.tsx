@@ -19,7 +19,7 @@ const readAvatar = (file: File): Promise<string> =>
       const s = Math.min(img.width, img.height);
       c.getContext('2d')!.drawImage(img, (img.width - s) / 2, (img.height - s) / 2, s, s, 0, 0, size, size);
       URL.revokeObjectURL(url);
-      resolve(c.toDataURL('image/png'));
+      resolve(c.toDataURL('image/jpeg', 0.86));
     };
     img.src = url;
   });
@@ -166,7 +166,7 @@ function WeekChart() {
 }
 
 export function Profile() {
-  const { state, profile, dispatch, toast } = useApp();
+  const { state, profile, dispatch, toast, syncStatus } = useApp();
   const dogs = dogsOf(profile);
   const [confirmReset, setConfirmReset] = useState(false);
 
@@ -234,6 +234,23 @@ export function Profile() {
         ))}
       </div>
 
+      <div className={`glass mt-6 flex items-center gap-3 p-4 text-sm ${syncStatus === 'fel' ? 'border-rose-300/30' : ''}`}>
+        <span
+          className={`h-2.5 w-2.5 shrink-0 rounded-full ${syncStatus === 'synkad' ? 'bg-emerald-400' : syncStatus === 'ansluter' ? 'animate-pulse bg-amber-300' : syncStatus === 'fel' ? 'bg-rose-400' : 'bg-white/40'}`}
+        />
+        <div className="min-w-0 flex-1">
+          <div className="font-semibold">
+            {syncStatus === 'synkad' ? 'Synkas med ditt Claude-konto' : syncStatus === 'ansluter' ? 'Ansluter till Claudes lagring…' : syncStatus === 'fel' ? 'Kunde inte synka just nu' : 'Sparas bara på den här enheten'}
+          </div>
+          <div className="text-xs text-white/50">
+            {syncStatus === 'synkad'
+              ? 'Platser, minnen, pass och framsteg följer med på alla dina enheter.'
+              : syncStatus === 'fel'
+                ? 'Ändringarna sparas på enheten och synkas när anslutningen fungerar igen.'
+                : 'Öppna appen via länken i Claude för att synka mellan enheter.'}
+          </div>
+        </div>
+      </div>
       <button
         onClick={() => {
           if (confirmReset) {
