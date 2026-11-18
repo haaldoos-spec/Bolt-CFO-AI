@@ -1,7 +1,7 @@
 import { Flame } from 'lucide-react';
 import type { ProfileId } from '../types';
 import { useApp } from '../store/AppContext';
-import { PROFILE_META } from '../data/profiles';
+import { PROFILE_META, ageText } from '../data/profiles';
 import { Avatar } from './ui';
 import { ProfileHero } from './ProfileHero';
 import { streakFor } from '../lib/xp';
@@ -17,7 +17,8 @@ export function Header() {
   const sub =
     profile === 'both'
       ? `${state.dogs.senior.name} & ${state.dogs.puppy.name}`
-      : `${state.dogs[profile].name} · ${state.dogs[profile].ageLabel}`;
+      : `${PROFILE_META[profile].label} · ${ageText(state.dogs[profile].birth)}`;
+  const nameOf = (p: ProfileId) => (p === 'both' ? PROFILE_META.both.label : state.dogs[p].name);
 
   return (
     <header className="app-header px-4 pt-[calc(env(safe-area-inset-top)+14px)]">
@@ -25,7 +26,7 @@ export function Header() {
         <div>
           <div className="label">{greet}</div>
           <div key={profile} className="animate-rise font-display text-[26px] font-semibold leading-tight">
-            <span className="text-grad">{PROFILE_META[profile].label}</span>
+            <span className="text-grad">{nameOf(profile)}</span>
           </div>
           <div className="text-xs font-medium text-white/55">{sub}</div>
         </div>
@@ -54,7 +55,7 @@ export function Header() {
               onClick={() => setProfile(p)}
               className="relative z-10 flex flex-col items-center gap-1.5 rounded-[20px] py-2.5 transition active:scale-95"
               aria-pressed={active}
-              aria-label={`Profil: ${PROFILE_META[p].label}`}
+              aria-label={`Profil: ${nameOf(p)}`}
             >
               {p === 'both' ? (
                 <div className="flex -space-x-3">
@@ -65,7 +66,7 @@ export function Header() {
                 <Avatar dog={p} size={active ? 40 : 34} ring={active} className="transition-all duration-500" />
               )}
               <span className={`text-[11px] font-bold tracking-wide transition ${active ? 'text-white' : 'text-white/50'}`}>
-                {PROFILE_META[p].label}
+                {nameOf(p)}
               </span>
             </button>
           );

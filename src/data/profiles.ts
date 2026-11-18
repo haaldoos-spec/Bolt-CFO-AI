@@ -59,7 +59,7 @@ export const PROFILE_META: Record<ProfileId, { label: string; short: string; foc
 export const DEFAULT_DOGS: Record<DogId, DogInfo> = {
   senior: {
     id: 'senior',
-    name: 'Svart Senior',
+    name: 'Zeppelin',
     breedLabel: 'Svart labrador',
     ageLabel: '9 år',
     birth: '2017-09-02',
@@ -68,13 +68,24 @@ export const DEFAULT_DOGS: Record<DogId, DogInfo> = {
   },
   puppy: {
     id: 'puppy',
-    name: 'Gul Valp',
+    name: 'Kyle',
     breedLabel: 'Gul labrador',
-    ageLabel: '5 mån',
-    birth: '2026-06-10',
+    ageLabel: '8 veckor',
+    birth: '2026-09-23',
     avatar: puppyAvatar,
-    weightKg: 17,
+    weightKg: 6,
   },
 };
+
+/** Ålder räknat från födelsedagen: veckor för valpar, månader under 2 år, sedan år */
+export const ageText = (birth: string, at: Date = new Date()) => {
+  const days = Math.floor((+at - +new Date(birth)) / 864e5);
+  if (days < 7 * 16) return `${Math.max(0, Math.floor(days / 7))} veckor`;
+  const months = Math.floor(days / 30.44);
+  if (months < 24) return `${months} mån`;
+  return `${Math.floor(days / 365.25)} år`;
+};
+
+export const OLD_DEFAULT_NAMES: Record<DogId, string> = { senior: 'Svart Senior', puppy: 'Gul Valp' };
 
 export const dogsOf = (p: ProfileId): DogId[] => (p === 'both' ? ['senior', 'puppy'] : [p]);

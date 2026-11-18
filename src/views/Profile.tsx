@@ -2,7 +2,7 @@ import { useRef, useState } from 'react';
 import { Camera, Clock, Flame, Image as ImageIcon, Pencil, RotateCcw, Star, Trophy } from 'lucide-react';
 import type { DogId } from '../types';
 import { useApp } from '../store/AppContext';
-import { dogsOf } from '../data/profiles';
+import { ageText, dogsOf } from '../data/profiles';
 import { DISCIPLINES } from '../data/training';
 import { disciplineProgress } from '../lib/coach';
 import { levelInfo, levelTitle, streakFor } from '../lib/xp';
@@ -76,7 +76,7 @@ function DogCard({ dog }: { dog: DogId }) {
               <Pencil size={14} className="text-white/40" />
             </button>
           )}
-          <div className="text-xs text-white/55">{info.breedLabel} · {info.ageLabel} · {info.weightKg} kg</div>
+          <div className="text-xs text-white/55">{info.breedLabel} · {ageText(info.birth)} · {info.weightKg} kg</div>
           <div className="mt-2 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-extrabold text-ink" style={{ background: 'linear-gradient(120deg,var(--a1),var(--a2))' }}>
             <Trophy size={12} /> Nivå {lv.level} · {levelTitle(lv.level)}
           </div>

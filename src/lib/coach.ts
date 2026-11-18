@@ -1,6 +1,6 @@
 import type { AppState, DisciplineId, DogId, ProfileId } from '../types';
 import { DISCIPLINES, EXERCISES } from '../data/training';
-import { dogsOf } from '../data/profiles';
+import { ageText, dogsOf } from '../data/profiles';
 import { streakFor } from './xp';
 
 export interface Insight {
@@ -58,11 +58,11 @@ export function generateInsights(state: AppState, profile: ProfileId): Insight[]
     }
 
     if (isPuppy) {
-      const m = ageMonths(info.birth);
+      const m = Math.max(2, ageMonths(info.birth));
       out.push({
         id: 'puppy-age',
         tone: 'care',
-        title: `${m} månader – tillväxtfas`,
+        title: `${ageText(info.birth)} – tillväxtfas`,
         body: `Tumregel: ca 5 min strukturerad aktivitet per levnadsmånad och pass (≈ ${m * 5} min för ${info.name}). Undvik hopp, trappor i fart och långa joggingturer tills lederna slutit sig (12–15 mån). Simning och kroppskontroll är guld.`,
         cta: { label: 'Valpagility på marknivå', discipline: 'agility', minutes: 15 },
       });

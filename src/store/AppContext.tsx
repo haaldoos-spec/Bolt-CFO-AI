@@ -3,7 +3,7 @@ import type { AppState, CheckIn, Place, DisciplineId, DogId, DogInfo, ProfileId,
 
 export type GeneratorPreset = { discipline?: DisciplineId | 'mix'; minutes?: number };
 import { seedState } from '../data/seed';
-import { DEFAULT_DOGS, THEMES } from '../data/profiles';
+import { DEFAULT_DOGS, OLD_DEFAULT_NAMES, THEMES } from '../data/profiles';
 
 type Action =
   | { type: 'xp'; dogs: DogId[]; amount: number }
@@ -72,11 +72,27 @@ const load = (): AppState => {
       (Object.keys(s.dogs) as DogId[]).forEach((d) => {
         if (!s.dogs[d].customAvatar) s.dogs[d].avatar = DEFAULT_DOGS[d].avatar;
       });
+      // Namn, födelsedag och vikt följer med uppdateringar så länge de inte ändrats i appen
+      (Object.keys(s.dogs) as DogId[]).forEach((d) => {
+        if (s.dogs[d].name === OLD_DEFAULT_NAMES[d]) s.dogs[d].name = DEFAULT_DOGS[d].name;
+        s.dogs[d].birth = DEFAULT_DOGS[d].birth;
+        s.dogs[d].ageLabel = DEFAULT_DOGS[d].ageLabel;
+        s.dogs[d].weightKg = DEFAULT_DOGS[d].weightKg;
+      });
+      // Demodata v2: valpen är 8 veckor och har precis kommit hem
+      if ((s.seedVersion ?? 1) < 2) {
+        const seed = seedState();
+        const seedIds = new Set(['s1', 's2', 's3', 's4', 's5', 's6', 'c1', 'c2', 'c3', 'c4', 'c5', 'qd1', 'qd2']);
+        s.sessions = [...seed.sessions, ...s.sessions.filter((x) => !seedIds.has(x.id))];
+        s.checkins = [...seed.checkins, ...s.checkins.filter((x) => !seedIds.has(x.id))];
+        s.questsDone = s.questsDone.filter((x) => !seedIds.has(x.id));
+        s.completed.puppy = [];
+        s.xp.puppy = (s.puppyGuide?.length ?? 0) * 10;
+        s.seedVersion = 2;
+      }
       s.myPlaces ??= [];
       s.puppyGuide ??= [];
       // Demominnen följer med när demoplatserna byts (t.ex. till Jönköping/Huskvarna)
-      const seedCheckins = seedState().checkins;
-      s.checkins = s.checkins.map((c) => { const seed = seedCheckins.find((x) => x.id === c.id); return seed ? { ...seed, date: c.date } : c; });
       return s;
     }
   } catch {

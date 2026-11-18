@@ -121,5 +121,7 @@ export interface AppState {
   myPlaces: Place[];
   /** Avbockade punkter i guiden Första tiden med valpen */
   puppyGuide: string[];
+  /** Version av demodatan, för migrering */
+  seedVersion?: number;
   questsDone: { id: string; questId: string; date: string; profile: ProfileId }[];
 }
