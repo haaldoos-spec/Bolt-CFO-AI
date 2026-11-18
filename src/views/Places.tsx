@@ -281,7 +281,6 @@ function CheckinSheet({ open, onClose, initialPlace, questTitle, onSaved }: {
         ref={fileRef}
         type="file"
         accept="image/*"
-        capture="environment"
         className="hidden"
         onChange={async (e) => {
           const f = e.target.files?.[0];
