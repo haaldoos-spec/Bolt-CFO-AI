@@ -62,7 +62,7 @@ export const DEFAULT_DOGS: Record<DogId, DogInfo> = {
     breedLabel: 'Svart labrador',
     ageLabel: '9 år',
     birth: '2017-09-02',
-    avatar: '/avatars/senior.svg',
+    avatar: '/avatars/senior.jpg',
     weightKg: 32,
   },
   puppy: {
@@ -71,7 +71,7 @@ export const DEFAULT_DOGS: Record<DogId, DogInfo> = {
     breedLabel: 'Gul labrador',
     ageLabel: '5 mån',
     birth: '2026-06-10',
-    avatar: '/avatars/puppy.svg',
+    avatar: '/avatars/puppy.jpg',
     weightKg: 17,
   },
 };

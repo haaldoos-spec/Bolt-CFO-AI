@@ -3,7 +3,7 @@ import type { AppState, CheckIn, DisciplineId, DogId, DogInfo, ProfileId, Sessio
 
 export type GeneratorPreset = { discipline?: DisciplineId | 'mix'; minutes?: number };
 import { seedState } from '../data/seed';
-import { THEMES } from '../data/profiles';
+import { DEFAULT_DOGS, THEMES } from '../data/profiles';
 
 type Action =
   | { type: 'xp'; dogs: DogId[]; amount: number }
@@ -51,7 +51,14 @@ function reducer(s: AppState, a: Action): AppState {
 const load = (): AppState => {
   try {
     const raw = localStorage.getItem(KEY);
-    if (raw) return JSON.parse(raw) as AppState;
+    if (raw) {
+      const s = JSON.parse(raw) as AppState;
+      // Inbyggda avatarer (sökvägar i /avatars) följer alltid med senaste versionen; egna uppladdningar behålls
+      (Object.keys(s.dogs) as DogId[]).forEach((d) => {
+        if (s.dogs[d].avatar.startsWith('/avatars/')) s.dogs[d].avatar = DEFAULT_DOGS[d].avatar;
+      });
+      return s;
+    }
   } catch {
     /* ignorera */
   }
