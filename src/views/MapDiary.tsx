@@ -2,9 +2,10 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { MapContainer, Marker, Tooltip, useMap, useMapEvents } from 'react-leaflet';
 import osmData from '../data/osm-map.json';
 import { createOsmLayer, type OsmData } from '../lib/osmLayer';
+import { appleMapsUrl, createIllustratedMap, googleMapsUrl } from '../lib/illustratedMap';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { Bookmark, Camera, Check, Crosshair, ImagePlus, LocateFixed, MapPin, Navigation, Plus, Star, Trash2, X } from 'lucide-react';
+import { Map as MapIcon, Bookmark, Camera, Check, Crosshair, ImagePlus, LocateFixed, MapPin, Navigation, Plus, Star, Trash2, X } from 'lucide-react';
 import type { CheckIn, DogId, Place, PlaceCategory } from '../types';
 import { useApp } from '../store/AppContext';
 import { DEFAULT_CENTER, DEFAULT_ZOOM, HOME_LABEL, PLACES, PLACE_CATS, distanceKm } from '../data/places';
@@ -22,11 +23,10 @@ function OsmBase() {
     // Utan inbakad data (innan scripts/osm/build_map.py körts) används vanliga kartbilder
     const hasData = Object.keys(data.layers).length > 0;
     const inArtifact = import.meta.env.VITE_ARTIFACT === '1';
-    if (!hasData && inArtifact) map.getContainer().classList.add('map-offline');
     const layer = hasData
       ? createOsmLayer(data).addTo(map)
       : inArtifact
-        ? L.layerGroup().addTo(map)
+        ? createIllustratedMap().addTo(map)
         : L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { attribution: '© OpenStreetMap © CARTO' }).addTo(map);
     const labels = L.layerGroup(
       data.labels.map(([name, lat, lng, kind]) =>
@@ -342,6 +342,7 @@ export function MapDiary() {
   const [marking, setMarking] = useState(false);
   const [newPos, setNewPos] = useState<[number, number] | null>(null);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [realMap, setRealMap] = useState<{ lat: number; lng: number; zoom: number } | null>(null);
   const mapRef = useRef<HTMLDivElement>(null);
   const leaflet = useRef<L.Map | null>(null);
   const grabMap = useCallback((m: L.Map) => (leaflet.current = m), []);
@@ -440,6 +441,18 @@ export function MapDiary() {
           {userPos && <Marker position={userPos} icon={meIcon} />}
         </MapContainer>
         <div className="pointer-events-none absolute inset-0 z-[400] rounded-[28px] ring-1 ring-inset ring-white/15" />
+        {!marking && (
+          <button
+            onClick={() => {
+              const m = leaflet.current;
+              const c = m?.getCenter();
+              setRealMap({ lat: c?.lat ?? DEFAULT_CENTER[0], lng: c?.lng ?? DEFAULT_CENTER[1], zoom: m?.getZoom() ?? DEFAULT_ZOOM });
+            }}
+            className="glass-strong absolute right-3 top-3 z-[500] flex items-center gap-1.5 !rounded-full bg-black/50 px-3.5 py-2 text-xs font-bold active:scale-95"
+          >
+            <MapIcon size={14} /> Riktig karta
+          </button>
+        )}
         {marking ? (
           <>
             <div className="pointer-events-none absolute left-1/2 top-1/2 z-[450] -translate-x-1/2 -translate-y-full">
@@ -603,7 +616,10 @@ export function MapDiary() {
               rel="noreferrer"
               className="btn-ghost mt-2 w-full"
             >
-              <Navigation size={16} /> Vägbeskrivning i Kartor
+              <Navigation size={16} /> Vägbeskrivning i Apple Kartor
+            </a>
+            <a href={googleMapsUrl(placeOpen.lat, placeOpen.lng, 15, placeOpen.name)} target="_blank" rel="noreferrer" className="btn-ghost mt-2 w-full">
+              <MapIcon size={16} /> Öppna i Google Maps
             </a>
             {placeOpen.custom && (
               <button
@@ -647,6 +663,25 @@ export function MapDiary() {
             <div className="mt-5 grid grid-cols-2 gap-2">
               <button onClick={() => { flyTo([memory.lat, memory.lng], 15); setMemory(null); }} className="btn-ghost"><MapPin size={16} /> Visa på karta</button>
               <button onClick={() => { dispatch({ type: 'deleteCheckin', id: memory.id }); setMemory(null); }} className="btn-ghost !text-rose-300"><Trash2 size={16} /> Ta bort</button>
+            </div>
+          </>
+        )}
+      </Sheet>
+
+      {/* Öppna riktig karta för det kartutsnitt man tittar på */}
+      <Sheet open={!!realMap} onClose={() => setRealMap(null)} title="Öppna riktig karta">
+        {realMap && (
+          <>
+            <p className="-mt-2 mb-4 text-sm leading-relaxed text-white/65">
+              Kartan i appen är en förenklad illustration. Öppna samma område i en riktig kartapp för gator, vägbeskrivning och din position.
+            </p>
+            <div className="space-y-2">
+              <a href={appleMapsUrl(realMap.lat, realMap.lng, realMap.zoom)} target="_blank" rel="noreferrer" className="btn-accent w-full" onClick={() => setRealMap(null)}>
+                <Navigation size={18} /> Apple Kartor
+              </a>
+              <a href={googleMapsUrl(realMap.lat, realMap.lng, realMap.zoom)} target="_blank" rel="noreferrer" className="btn-ghost w-full" onClick={() => setRealMap(null)}>
+                <MapIcon size={18} /> Google Maps
+              </a>
             </div>
           </>
         )}
