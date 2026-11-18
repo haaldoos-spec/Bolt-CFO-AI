@@ -101,13 +101,16 @@ export const DISCIPLINES: Discipline[] = [
   {
     id: 'freestyle', name: 'Freestyle & HtM', tagline: 'Kreativ lydnad till musik', goalLabel: 'Freestyle klass 1', icon: 'Music',
     rules: {
-      org: 'SKK / Svenska Hundfreestyleklubben (SHFK)', period: 'Sammanfattning från SKK och SHFK', official: true,
+      org: 'Svenska Hundfreestyleklubben (SHFK) – Regler för freestyle', period: 'Gäller 2022–2026 (nya regler 2027–2031 har samma grunder)', official: true,
       facts: [
-        'Alla hundar som fyllt 12 månader får tävla. Du behöver vara medlem i en klubb inom SKK.',
-        'Två grenar: freestyle med nästan fritt valda rörelser, och heelwork to music (HtM) som byggs kring tio fasta positioner runt föraren.',
-        'Tre klasser. Programmet får vara högst 2,5 min i klass 1, 3,5 min i klass 2 och 4 min i klass 3.',
-        'Bedöms i tre kategorier – precision, innehåll och tolkning av musiken – med högst 10 poäng var.',
-        'Rekvisita får finnas i ringen men inte användas som leksak för hunden.',
+        'Hunden ska ha fyllt 12 månader på tävlingsdagen.',
+        'Programlängd: klass 1 minst 1 och högst 2 min, klass 2 2–3 min, klass 3 3–4 min.',
+        'HtM: minst 75 % av programmet i de tio HtM-positionerna. Freestyle: högst 25 % HtM-positioner. Annars minst 2,6 poängs avdrag i Innehåll.',
+        'En HtM-position räknas bara när hunden rör sig på alla fyra tassarna inom ca 50 cm från föraren – sitt eller kryp räknas inte.',
+        'Bedöms i Precision och samarbete, Innehåll och Tolkning av musik, 0–10 poäng var.',
+        'Uppflyttning: minst 75 % i snitt i alla tre kategorier. Tre sådana resultat ger diplom (klass 1–2).',
+        'Godis eller leksak får finnas i fickan men inte synas. Belöning på planen = diskvalificering – belöna efter att ni lämnat planen.',
+        'Rekvisita får användas men inte som belöningsleksak.',
       ],
     },
   },

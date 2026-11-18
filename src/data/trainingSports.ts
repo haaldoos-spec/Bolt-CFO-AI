@@ -4,8 +4,8 @@ import type { Exercise } from '../types';
 export const SPORT_EXERCISES: Exercise[] = [
   // ═════════════ FREESTYLE & HEELWORK TO MUSIC ═════════════
   {
-    id: 'f-hoger-fot', discipline: 'freestyle', level: 'byggsten', title: 'Fotposition på höger sida',
-    summary: 'Samma fotposition som i lydnaden – fast på höger sida. En av de fasta positionerna i heelwork to music.',
+    id: 'f-hoger-fot', discipline: 'freestyle', level: 'byggsten', title: 'Höger fot (HtM-position 5)',
+    summary: 'Hundens vänstra skuldra vid ditt högra ben – spegelbilden av vanlig fotposition (position 1).',
     suits: ['puppy', 'senior'], minutes: 6, intensity: 1, equipment: ['godis', 'klicker', 'pall'],
     steps: [
       'Stå med höger sida mot en vägg eller pall så hunden bara får plats rakt. Belöna med höger hand.',
@@ -15,15 +15,15 @@ export const SPORT_EXERCISES: Exercise[] = [
     criteria: ['Går 10 steg i höger fot', 'Byter mellan vänster och höger fot på signal'],
   },
   {
-    id: 'f-positioner', discipline: 'freestyle', level: 'byggsten', title: 'Positioner runt föraren',
-    summary: 'Framför dig, bakom dig och mitt emellan benen – positionerna som heelwork bygger på.',
+    id: 'f-positioner', discipline: 'freestyle', level: 'byggsten', title: 'De tio HtM-positionerna',
+    summary: 'Framför, bakom, baklänges och mellan benen – de tio fasta positionerna som heelwork to music bygger på.',
     suits: ['puppy', 'senior'], minutes: 8, intensity: 1, equipment: ['godis', 'klicker'],
     steps: [
-      'Framför: hunden står vänd mot dig. Belöna när den följer med när du går bakåt.',
-      'Bakom: lura hunden runt dig till positionen bakom dina ben. Belöna där.',
-      'Mitten: hunden står mellan dina ben, vänd framåt. Ta små steg tillsammans.',
+      'Lär en position i taget: 1 vänster fot, 5 höger fot, 2/6 framför dig, 4/8 bakom dig, 3/7 bredvid men vänd åt andra hållet, 9/10 mellan dina ben.',
+      'Hunden ska vara rak, parallell med dig och högst ca 50 cm bort. Ta få steg och belöna i positionen.',
+      'Ge varje position ett eget ord och gå några steg i varje. Sitt och kryp räknas inte – hunden ska gå.',
     ],
-    criteria: ['Tre positioner på egna signaler', 'Hunden håller positionen 3 steg'],
+    criteria: ['Minst fyra positioner på egna signaler', 'Hunden går 3 steg rakt i varje position'],
     labbeHack: { general: 'Labbar är stora – ta korta steg och bred stans när hunden ska stå mellan dina ben.' },
   },
   {
@@ -87,7 +87,7 @@ export const SPORT_EXERCISES: Exercise[] = [
   },
   {
     id: 'f-kedja-htm', discipline: 'freestyle', level: 'kedja', title: 'Kedja: Fyra positioner på åtta takter',
-    summary: 'Vänster fot – höger fot – framför – bakom, två takter var.',
+    summary: 'Position 1 (vänster fot) – 5 (höger fot) – 2 (framför) – 4 (bakom), två takter var.',
     suits: ['puppy', 'senior'], minutes: 10, intensity: 1, equipment: ['godis'],
     builtFrom: ['f-hoger-fot', 'f-positioner', 'f-musik'],
     steps: ['Räkna högt till 8 i musikens takt.', 'Byt position var andra takt.', 'Belöna efter hela sekvensen.'],
@@ -103,7 +103,7 @@ export const SPORT_EXERCISES: Exercise[] = [
   },
   {
     id: 'f-program-fs', discipline: 'freestyle', level: 'program', title: 'Program: Freestyle klass 1',
-    summary: 'Ett eget program till musik med fritt valda rörelser, max 2,5 minuter.',
+    summary: 'Ett eget program till musik med fritt valda rörelser, 1–2 minuter. Högst 25 % HtM-positioner.',
     suits: ['puppy', 'senior'], minutes: 20, intensity: 1, equipment: ['godis', 'matta'],
     builtFrom: ['f-kedja-tricks', 'f-cirkel', 'f-vinka', 'f-kedja-htm'],
     moments: [
@@ -114,30 +114,31 @@ export const SPORT_EXERCISES: Exercise[] = [
       'Avslutning i takt med musiken',
     ],
     steps: [
-      'Välj musik och klipp den till högst 2,5 minuter. Skriv ett manus med rörelser per fras.',
+      'Välj musik och klipp den till 1–2 minuter. Skriv ett manus med rörelser per fras.',
       'Träna en fras i taget med belöning. Sätt ihop två fraser i taget.',
       'Filma en genomkörning och titta på precision, innehåll och hur ni tolkar musiken.',
     ],
-    criteria: ['Hela programmet utan belöning', 'Hunden glad hela vägen'],
+    criteria: ['Hela programmet utan belöning – belöna efter att ni lämnat planen', 'Hunden glad hela vägen'],
     labbeHack: { senior: 'Bygg seniorens program på lugna rörelser: backa, sidsteg, vinka och fotarbete i skritt.' },
   },
   {
     id: 'f-program-htm', discipline: 'freestyle', level: 'program', title: 'Program: Heelwork to music klass 1',
-    summary: 'Ett program där det mesta är fotarbete i de fasta positionerna.',
+    summary: 'Ett program på 1–2 minuter där minst 75 % är fotarbete i de tio HtM-positionerna.',
     suits: ['puppy', 'senior'], minutes: 20, intensity: 1, equipment: ['godis'],
     builtFrom: ['f-kedja-htm', 'f-backa-fot', 'f-sidsteg', 'v-fotposition'],
     moments: [
-      'Vänster fot framåt med tempobyten',
-      'Höger fot framåt',
-      'Backa i fot',
-      'Sidsteg i fot',
-      'Hunden framför, föraren backar',
-      'Avslut i fotposition',
+      'Position 1 – vänster fot framåt med tempobyten',
+      'Position 5 – höger fot framåt',
+      'Backa i position 1',
+      'Sidsteg i position 1',
+      'Position 2 – hunden framför, föraren backar',
+      'Position 9 – mellan förarens ben',
+      'Avslut i position 1',
     ],
     steps: [
       'Bygg programmet kring positionerna – minst tre fjärdedelar ska vara fotarbete.',
       'Kör en position åt gången till musiken.',
-      'Sätt ihop hela programmet, max 2,5 minuter.',
+      'Sätt ihop hela programmet, 1–2 minuter.',
     ],
     criteria: ['Hela programmet med fotarbete i minst 4 positioner'],
   },
