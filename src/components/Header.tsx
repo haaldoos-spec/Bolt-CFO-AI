@@ -3,12 +3,13 @@ import type { ProfileId } from '../types';
 import { useApp } from '../store/AppContext';
 import { PROFILE_META } from '../data/profiles';
 import { Avatar } from './ui';
+import { ProfileHero } from './ProfileHero';
 import { streakFor } from '../lib/xp';
 
 const ORDER: ProfileId[] = ['senior', 'both', 'puppy'];
 
 export function Header() {
-  const { profile, setProfile, state } = useApp();
+  const { profile, setProfile, state, tab } = useApp();
   const idx = ORDER.indexOf(profile);
   const streak = streakFor(state);
   const hour = new Date().getHours();
@@ -70,6 +71,8 @@ export function Header() {
           );
         })}
       </div>
+
+      {tab === 'home' && <ProfileHero />}
     </header>
   );
 }
