@@ -15,22 +15,21 @@ const queryFor = (p: Place) => p.mapsQuery ?? `${p.name}, ${HOME_LABEL}`;
 /** Målet för kartappen: egna platser med exakt position, annars söktext */
 const destinationFor = (p: Place) => {
   if (p.custom && !p.noCoords) return `${p.lat},${p.lng}`;
-  if (p.custom) return /,/.test(p.name) ? p.name : `${p.name}, ${HOME_LABEL}`;
+  if (p.custom) return p.address ?? (/,/.test(p.name) ? p.name : `${p.name}, ${HOME_LABEL}`);
   return queryFor(p);
 };
 
 /** Visa platsen – Apple Kartor på iPhone, Google Maps på datorn */
 const mapsLinkFor = (p: Place) => {
   if (!isAppleMobile()) return p.mapsUrl?.includes('google') ? p.mapsUrl : googleMapsSearchUrl(destinationFor(p));
-  if (p.custom) return p.noCoords ? (p.mapsUrl ?? appleMapsSearchUrl(queryFor(p))) : appleMapsPlaceAtUrl(p.lat, p.lng, p.name);
+  if (p.custom) return p.noCoords ? (p.mapsUrl || appleMapsSearchUrl(destinationFor(p))) : appleMapsPlaceAtUrl(p.lat, p.lng, p.name);
   return appleMapsSearchUrl(queryFor(p));
 };
 
 /** Vägbeskrivning dit – det som öppnas när man trycker på en plats */
 const directionsFor = (p: Place, mode: TravelMode = 'driving') => {
-  // Kort delningslänk utan position (maps.app.goo.gl / maps.apple/p): öppna länken själv –
-  // den visar exakt rätt plats, och vägbeskrivningen startas därifrån.
-  if (p.custom && p.noCoords && p.mapsUrl) return p.mapsUrl;
+  // Kort delningslänk utan position eller adress: öppna länken själv – den visar exakt rätt plats
+  if (p.custom && p.noCoords && !p.address && p.mapsUrl) return p.mapsUrl;
   return isAppleMobile() ? appleMapsDirectionsUrl(destinationFor(p), mode) : googleMapsDirectionsUrl(destinationFor(p), mode);
 };
 
@@ -131,17 +130,18 @@ function AddFromMaps({ onSaved }: { onSaved: (p: Place) => void }) {
 
   const saveManual = !parsed && name.trim().length > 1;
 
-  const save = () => {
-    const finalName = name.trim() || 'Min plats';
+  const buildPlace = (): Place => {
+    const finalName = name.trim() || parsed?.address || 'Min plats';
     const hasCoords = parsed?.lat !== undefined && parsed?.lng !== undefined;
-    const place: Place = {
+    return {
       id: `my-${crypto.randomUUID()}`,
       name: finalName,
       category: cat,
       lat: hasCoords ? parsed!.lat! : DEFAULT_CENTER[0],
       lng: hasCoords ? parsed!.lng! : DEFAULT_CENTER[1],
       noCoords: !hasCoords,
-      mapsUrl: parsed?.url,
+      mapsUrl: parsed?.url || undefined,
+      address: parsed?.address,
       description: note.trim(),
       goodFor: [],
       seniorFriendly: profile !== 'puppy',
@@ -149,8 +149,12 @@ function AddFromMaps({ onSaved }: { onSaved: (p: Place) => void }) {
       custom: true,
       createdAt: new Date().toISOString(),
     };
+  };
+
+  const save = () => {
+    const place = buildPlace();
     dispatch({ type: 'addPlace', place });
-    toast(`${finalName} sparad ⭐`);
+    toast(`${place.name} sparad ⭐`);
     onSaved(place);
     reset();
   };
@@ -174,8 +178,8 @@ function AddFromMaps({ onSaved }: { onSaved: (p: Place) => void }) {
       {error && <p className="mt-2 text-xs text-rose-200">{error}</p>}
       {parsed && (
         <p className="mt-2 flex items-center gap-1.5 text-xs font-semibold text-emerald-300">
-          <Check size={14} /> Länk från {parsed.source === 'apple' ? 'Apple Kartor' : parsed.source === 'google' ? 'Google Maps' : 'webben'}
-          {parsed.lat !== undefined ? ' med position – vägbeskrivning går direkt dit' : ' (kort länk) – öppnar exakt rätt plats, tryck Vägbeskrivning där'}
+          <Check size={14} /> {parsed.source === 'koordinater' ? 'Koordinater' : `Länk från ${parsed.source === 'apple' ? 'Apple Kartor' : parsed.source === 'google' ? 'Google Maps' : 'webben'}`}
+          {parsed.lat !== undefined ? ' med position – vägbeskrivning går direkt dit' : parsed.address ? ' med adress – vägbeskrivning går dit' : ' (kort länk utan position)'}
         </p>
       )}
 
@@ -186,6 +190,13 @@ function AddFromMaps({ onSaved }: { onSaved: (p: Place) => void }) {
         placeholder="Namn, t.ex. Grillplats Egnahem"
         className="mt-3 w-full rounded-2xl border border-white/15 bg-white/5 px-3.5 py-3 text-sm font-semibold outline-none placeholder:font-normal placeholder:text-white/35 focus:border-white/35"
       />
+
+      {parsed && parsed.lat === undefined && !parsed.address && (
+        <div className="mt-3 rounded-2xl border border-amber-200/25 bg-amber-300/[0.08] p-3 text-[12.5px] leading-relaxed text-white/80">
+          Den här korta länken innehåller ingen position, så ett tryck öppnar platsen i Kartor och du får trycka på Vägbeskrivning där.
+          För vägen direkt med ett tryck: kopiera platsens <b>koordinater</b> i Kartor (t.ex. ”57.78912, 14.28851”) och klistra in dem på en egen rad under länken.
+        </div>
+      )}
 
       {(parsed || name.trim()) && (
         <div className="animate-rise">
@@ -207,9 +218,14 @@ function AddFromMaps({ onSaved }: { onSaved: (p: Place) => void }) {
             placeholder="Anteckning (valfritt) – t.ex. vindskydd, ved finns"
             className="mt-3 w-full rounded-2xl border border-white/15 bg-white/5 px-3.5 py-3 text-sm outline-none placeholder:text-white/35 focus:border-white/35"
           />
-          <button onClick={save} className="btn-accent mt-3 w-full">
-            <Star size={18} /> {saveManual ? 'Spara (öppnas som sökning i Kartor)' : 'Spara i appen'}
+          {/* Länken sparar platsen och öppnar vägbeskrivningen i samma tryck */}
+          <a href={directionsFor(buildPlace())} target="_blank" rel="noreferrer" onClick={save} className="btn-accent mt-3 w-full">
+            <Navigation size={18} /> Spara och visa vägen dit
+          </a>
+          <button onClick={save} className="btn-ghost mt-2 w-full !py-2.5 text-sm">
+            <Star size={16} /> Spara utan att öppna kartan
           </button>
+          {saveManual && <p className="mt-2 text-[11px] text-white/45">Utan länk söker kartan på namnet i {HOME_LABEL}. Säkrast är att klistra in en länk eller koordinater.</p>}
         </div>
       )}
     </div>
@@ -463,6 +479,12 @@ export function Places() {
               {distText(placeOpen) && <span className="chip"><Navigation size={11} /> {distText(placeOpen)} från {HOME_LABEL}</span>}
             </div>
             {placeOpen.description && <p className="mb-4 text-[15px] leading-relaxed text-white/75">{placeOpen.description}</p>}
+            {placeOpen.custom && (
+              <div className="mb-4 rounded-2xl bg-white/[0.05] p-3 text-[11px] leading-relaxed text-white/50">
+                {placeOpen.noCoords ? (placeOpen.address ? `Adress: ${placeOpen.address}` : 'Ingen position – öppnar den sparade länken.') : `Position: ${placeOpen.lat.toFixed(5)}, ${placeOpen.lng.toFixed(5)}`}
+                {placeOpen.mapsUrl && <div className="mt-1 select-all break-all text-white/40">{placeOpen.mapsUrl}</div>}
+              </div>
+            )}
             {placeOpen.goodFor.length > 0 && (
               <>
                 <div className="label mb-2">Bra för</div>

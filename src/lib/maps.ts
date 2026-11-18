@@ -42,7 +42,8 @@ export interface ParsedMapsLink {
   name?: string;
   lat?: number;
   lng?: number;
-  source: 'apple' | 'google' | 'annan';
+  address?: string;
+  source: 'apple' | 'google' | 'annan' | 'koordinater';
 }
 
 const pair = (v: string | null | undefined): [number, number] | undefined => {
@@ -54,7 +55,13 @@ const pair = (v: string | null | undefined): [number, number] | undefined => {
 /** Hittar en kartlänk i inklistrad text och plockar ut namn och koordinater när de finns */
 export function parseMapsLink(text: string): ParsedMapsLink | null {
   const urlMatch = text.match(/https?:\/\/[^\s<>"]+/);
-  if (!urlMatch) return null;
+  if (!urlMatch) {
+    // Bara koordinater, t.ex. kopierade från en nål i Kartor: "57.78912, 14.28851"
+    const c = pair(text);
+    if (!c || Math.abs(c[0]) > 90 || Math.abs(c[1]) > 180) return null;
+    const label = text.split('\n').map((l) => l.trim()).find((l) => l && !pair(l) && l.length < 80);
+    return { url: '', lat: c[0], lng: c[1], name: label, source: 'koordinater' };
+  }
   const raw = urlMatch[0].replace(/[),.]+$/, '');
   let u: URL;
   try {
@@ -73,7 +80,9 @@ export function parseMapsLink(text: string): ParsedMapsLink | null {
     // coordinate/ll är platsens position. sll är bara sökområdet och används inte.
     const c = pair(p.get('coordinate')) ?? pair(p.get('ll')) ?? pair(p.get('q')) ?? pair(p.get('daddr'));
     if (c) [out.lat, out.lng] = c;
-    const name = p.get('name') ?? p.get('q') ?? p.get('address') ?? undefined;
+    const address = p.get('address') ?? undefined;
+    if (address) out.address = address;
+    const name = p.get('name') ?? p.get('q') ?? address ?? undefined;
     if (name && !pair(name)) out.name = name;
   } else if (host.includes('google') || host.includes('goo.gl')) {
     out.source = 'google';
@@ -99,7 +108,12 @@ export function parseMapsLink(text: string): ParsedMapsLink | null {
     const q = u.searchParams.get('q') ?? u.searchParams.get('query');
     if (!out.name && q && !pair(q)) out.name = q;
   }
-  if (!out.name && textName) out.name = textName;
+  if (!out.name && textName && !pair(textName)) out.name = textName;
+  // Länk utan position men koordinater inklistrade bredvid – använd dem
+  if (out.lat === undefined) {
+    const c = pair(text.replace(urlMatch[0], ''));
+    if (c) [out.lat, out.lng] = c;
+  }
   if (out.lat !== undefined && (Math.abs(out.lat) > 90 || Math.abs(out.lng ?? 0) > 180)) {
     out.lat = undefined;
     out.lng = undefined;
