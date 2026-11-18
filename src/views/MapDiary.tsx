@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { MapContainer, Marker, TileLayer, Tooltip, useMap, useMapEvents } from 'react-leaflet';
+import { MapContainer, Marker, Tooltip, useMap, useMapEvents } from 'react-leaflet';
+import osmData from '../data/osm-map.json';
+import { createOsmLayer, type OsmData } from '../lib/osmLayer';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { Bookmark, Camera, Check, Crosshair, ImagePlus, LocateFixed, MapPin, Navigation, Plus, Star, Trash2, X } from 'lucide-react';
@@ -9,8 +11,40 @@ import { DEFAULT_CENTER, DEFAULT_ZOOM, HOME_LABEL, PLACES, PLACE_CATS, distanceK
 import { dogsOf } from '../data/profiles';
 import { Avatar, ICONS, SectionTitle, Sheet } from '../components/ui';
 
-/** I Claude-artefakten blockeras externa kartbilder – då visas en stiliserad karta */
-const OFFLINE_MAP = import.meta.env.VITE_ARTIFACT === '1';
+/**
+ * Riktig karta ritad i webbläsaren från inbakad OpenStreetMap-data (fungerar även i
+ * Claude-artefakten, där externa kartbilder blockeras).
+ */
+function OsmBase() {
+  const map = useMap();
+  useEffect(() => {
+    const data = osmData as unknown as OsmData;
+    // Utan inbakad data (innan scripts/osm/build_map.py körts) används vanliga kartbilder
+    const layer = Object.keys(data.layers).length
+      ? createOsmLayer(data).addTo(map)
+      : L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { attribution: '© OpenStreetMap © CARTO' }).addTo(map);
+    const labels = L.layerGroup(
+      data.labels.map(([name, lat, lng, kind]) =>
+        L.marker([lat, lng], {
+          interactive: false,
+          keyboard: false,
+          icon: L.divIcon({
+            className: `osm-label k-${kind}`,
+            html: kind === 'dog_park' ? `<span>🐕 ${name}</span>` : `<span>${name}</span>`,
+            iconSize: [0, 0],
+          }),
+        }),
+      ),
+    ).addTo(map);
+    const b = L.latLngBounds(data.bounds);
+    map.setMaxBounds(b.pad(0.15));
+    return () => {
+      layer.remove();
+      labels.remove();
+    };
+  }, [map]);
+  return null;
+}
 
 const CAT_EMOJI: Record<PlaceCategory, string> = { skog: '🌲', balans: '🪨', cafe: '☕', vatten: '🌊' };
 
@@ -40,11 +74,15 @@ const photoIcon = (c: CheckIn) =>
 /** Döljer platsnamnen när man zoomat ut, så de inte krockar */
 function LabelToggle() {
   const map = useMapEvents({
-    zoomend: () => map.getContainer().classList.toggle('labels-hidden', map.getZoom() < 12.25),
+    zoomend: () => apply(),
   });
-  useEffect(() => {
-    map.getContainer().classList.toggle('labels-hidden', map.getZoom() < 12.25);
-  }, [map]);
+  const apply = () => {
+    const z = map.getZoom();
+    const el = map.getContainer();
+    el.classList.toggle('labels-hidden', z < 12.25);
+    [12, 13, 14, 15, 16].forEach((n) => el.classList.toggle(`zoom-ge-${n}`, z >= n));
+  };
+  useEffect(apply, [map]);
   return null;
 }
 
@@ -379,23 +417,16 @@ export function MapDiary() {
       </div>
 
       <div ref={mapRef} className="glass relative h-[52vh] min-h-[340px] overflow-hidden !rounded-[28px] p-0">
-        <MapContainer center={DEFAULT_CENTER} zoom={DEFAULT_ZOOM} zoomSnap={0.5} className={`h-full w-full ${OFFLINE_MAP ? 'map-offline' : ''}`} attributionControl={!OFFLINE_MAP}>
-          {!OFFLINE_MAP && (
-            <TileLayer
-              url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
-              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/">CARTO</a>'
-            />
-          )}
+        <MapContainer center={DEFAULT_CENTER} zoom={DEFAULT_ZOOM} zoomSnap={0.5} minZoom={10} maxZoom={19} className="h-full w-full" attributionControl>
+          <OsmBase />
           <FlyTo target={fly} />
           <LabelToggle />
           <MapGrab onMap={grabMap} onClick={(ll) => marking && leaflet.current?.panTo(ll)} />
           {places.map((p) => (
             <Marker key={p.id} position={[p.lat, p.lng]} icon={placeIcon(p)} eventHandlers={{ click: () => setPlaceOpen(p) }}>
-              {OFFLINE_MAP && (
-                <Tooltip permanent direction="bottom" offset={[0, 4]} className="place-label">
-                  {p.name.split(' – ')[0]}
-                </Tooltip>
-              )}
+              <Tooltip permanent direction="bottom" offset={[0, 4]} className="place-label">
+                {p.name.split(' – ')[0]}
+              </Tooltip>
             </Marker>
           ))}
           {state.checkins.map((c) => (

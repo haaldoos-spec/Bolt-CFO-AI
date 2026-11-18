@@ -87,15 +87,6 @@ input[type=range] { accent-color: var(--a1); }
 /* Inuti Claude-artefakten paddar värdsidan redan :root med safe-area */
 html.artifact .app-header { padding-top: 14px; }
 
-/* Kartbakgrund när kartbilder inte kan laddas (t.ex. i Claude-artefakten) */
-.map-offline {
-  background:
-    radial-gradient(ellipse at 70% 60%, rgba(103,232,249,.10), transparent 55%),
-    radial-gradient(ellipse at 20% 30%, rgba(74,222,128,.08), transparent 50%),
-    linear-gradient(rgba(255,255,255,.045) 1px, transparent 1px) 0 0 / 40px 40px,
-    linear-gradient(90deg, rgba(255,255,255,.045) 1px, transparent 1px) 0 0 / 40px 40px,
-    #0b0d14 !important;
-}
 .place-label { background: rgba(10,12,20,.72) !important; border: 1px solid rgba(255,255,255,.18) !important; color: #fff !important; border-radius: 9999px !important; padding: 2px 8px !important; font-size: 10.5px !important; font-weight: 700; box-shadow: none !important; }
 .place-label::before { display: none; }
 .labels-hidden .place-label { display: none; }
@@ -106,3 +97,19 @@ html.artifact .app-header { padding-top: 14px; }
   box-shadow: 0 6px 20px rgba(0,0,0,.5), 0 0 18px rgba(253,230,138,.6);
 }
 .my-pin > span { transform: rotate(45deg); font-size: 16px; }
+.leaflet-container { background: #10131c; }
+.leaflet-control-attribution .leaflet-attribution-flag { display: none !important; }
+/* Namn ur OpenStreetMap (stadsdelar, sjöar, hundrastgårdar) */
+.osm-label { pointer-events: none; }
+.osm-label span {
+  position: absolute; transform: translate(-50%, -50%); white-space: nowrap;
+  font-size: 11px; font-weight: 700; letter-spacing: .02em; color: rgba(226,232,255,.55);
+  text-shadow: 0 1px 3px #000, 0 0 8px #10131c; display: none;
+}
+.osm-label.k-water span { color: rgba(125,190,240,.75); font-style: italic; }
+.osm-label.k-dog_park span { color: #fcd34d; background: rgba(10,12,20,.75); border: 1px solid rgba(252,211,77,.4); border-radius: 9999px; padding: 2px 8px; text-shadow: none; }
+.osm-label.k-town span, .osm-label.k-city span { font-size: 14px; color: rgba(255,255,255,.75); text-transform: uppercase; letter-spacing: .12em; }
+.leaflet-container .osm-label.k-town span, .leaflet-container .osm-label.k-city span, .leaflet-container .osm-label.k-water span { display: block; }
+.zoom-ge-13 .osm-label.k-suburb span, .zoom-ge-13 .osm-label.k-village span, .zoom-ge-13 .osm-label.k-dog_park span { display: block; }
+.zoom-ge-15 .osm-label.k-neighbourhood span, .zoom-ge-15 .osm-label.k-quarter span, .zoom-ge-15 .osm-label.k-hamlet span, .zoom-ge-15 .osm-label.k-locality span { display: block; }
+.zoom-ge-13 .osm-label.k-town span, .zoom-ge-13 .osm-label.k-city span { opacity: .5; }
