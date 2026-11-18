@@ -19,6 +19,21 @@ export const appleMapsPlaceAtUrl = (lat: number, lng: number, name?: string) =>
 export const appleMapsDirectionsUrl = (destination: string, mode: TravelMode = 'driving') =>
   `https://maps.apple.com/?daddr=${enc(destination)}&dirflg=${mode === 'walking' ? 'w' : 'd'}`;
 
+/** Google Maps-vägbeskrivning – fungerar i alla webbläsare på datorn */
+export const googleMapsDirectionsUrl = (destination: string, mode: TravelMode = 'driving') =>
+  `https://www.google.com/maps/dir/?api=1&destination=${enc(destination)}&travelmode=${mode}`;
+
+export const googleMapsSearchUrl = (query: string) => `https://www.google.com/maps/search/?api=1&query=${enc(query)}`;
+
+/** iPhone/iPad öppnar Apple Kartor-appen. På datorn används Google Maps, som fungerar i alla webbläsare. */
+export const isAppleMobile = () => {
+  if (typeof navigator === 'undefined') return false;
+  const ua = navigator.userAgent;
+  return /iPhone|iPad|iPod/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1);
+};
+
+export const mapsAppName = () => (isAppleMobile() ? 'Apple Kartor' : 'Google Maps');
+
 export const googleMapsPlaceUrl = (name: string, town = 'Huskvarna') =>
   `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(name.includes(town) ? name : `${name}, ${town}`)}`;
 

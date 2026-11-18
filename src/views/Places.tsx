@@ -4,7 +4,7 @@ import type { CheckIn, DogId, Place, PlaceCategory } from '../types';
 import { useApp } from '../store/AppContext';
 import { DEFAULT_CENTER, HOME_LABEL, PLACES, PLACE_CATS, distanceKm } from '../data/places';
 import { dogsOf } from '../data/profiles';
-import { appleMapsDirectionsUrl, appleMapsPlaceAtUrl, appleMapsSearchUrl, googleMapsPlaceUrl, parseMapsLink, type ParsedMapsLink, type TravelMode } from '../lib/maps';
+import { appleMapsDirectionsUrl, appleMapsPlaceAtUrl, appleMapsSearchUrl, googleMapsDirectionsUrl, googleMapsPlaceUrl, googleMapsSearchUrl, isAppleMobile, mapsAppName, parseMapsLink, type ParsedMapsLink, type TravelMode } from '../lib/maps';
 import { Avatar, ICONS, SectionTitle, Sheet } from '../components/ui';
 
 const CAT_EMOJI: Record<PlaceCategory, string> = { skog: '🌲', balans: '🪨', cafe: '☕', vatten: '🌊' };
@@ -12,16 +12,19 @@ const CAT_EMOJI: Record<PlaceCategory, string> = { skog: '🌲', balans: '🪨',
 /** Söktext för platser utan exakt position */
 const queryFor = (p: Place) => p.mapsQuery ?? `${p.name}, ${HOME_LABEL}`;
 
-/** Visa platsen i Apple Kartor */
+/** Målet för kartappen: egna platser med exakt position, annars söktext */
+const destinationFor = (p: Place) => (p.custom && !p.noCoords ? `${p.lat},${p.lng}` : p.custom ? p.name : queryFor(p));
+
+/** Visa platsen – Apple Kartor på iPhone, Google Maps på datorn */
 const mapsLinkFor = (p: Place) => {
+  if (!isAppleMobile()) return p.mapsUrl?.includes('google') ? p.mapsUrl : googleMapsSearchUrl(destinationFor(p));
   if (p.custom) return p.noCoords ? (p.mapsUrl ?? appleMapsSearchUrl(queryFor(p))) : appleMapsPlaceAtUrl(p.lat, p.lng, p.name);
   return appleMapsSearchUrl(queryFor(p));
 };
 
-/** Vägbeskrivning dit – det som öppnas när man trycker på en plats.
- *  Egna platser: exakt position. Tips-platser: söktext, så Kartor hittar rätt ställe. */
+/** Vägbeskrivning dit – det som öppnas när man trycker på en plats */
 const directionsFor = (p: Place, mode: TravelMode = 'driving') =>
-  appleMapsDirectionsUrl(p.custom && !p.noCoords ? `${p.lat},${p.lng}` : p.custom ? p.name : queryFor(p), mode);
+  isAppleMobile() ? appleMapsDirectionsUrl(destinationFor(p), mode) : googleMapsDirectionsUrl(destinationFor(p), mode);
 
 const distText = (p: Place) => {
   if (p.noCoords) return null;
@@ -370,7 +373,7 @@ export function Places() {
       </div>
 
       <div className="grid grid-cols-2 gap-2">
-        <a href={appleMapsPlaceAtUrl(DEFAULT_CENTER[0], DEFAULT_CENTER[1], HOME_LABEL)} target="_blank" rel="noreferrer" className="btn-ghost !justify-start !py-3.5">
+        <a href={isAppleMobile() ? appleMapsPlaceAtUrl(DEFAULT_CENTER[0], DEFAULT_CENTER[1], HOME_LABEL) : `https://www.google.com/maps/@${DEFAULT_CENTER[0]},${DEFAULT_CENTER[1]},13z`} target="_blank" rel="noreferrer" className="btn-ghost !justify-start !py-3.5">
           <MapIcon size={18} className="text-[var(--a1)]" /> Öppna Kartor
         </a>
         <button onClick={() => setCheckin({})} className="btn-accent !justify-start !py-3.5">
@@ -386,7 +389,7 @@ export function Places() {
       <div className="space-y-2">
         {mine.map((p) => <PlaceRow key={p.id} p={p} onMore={() => setPlaceOpen(p)} />)}
         {!mine.length && !filters.length && (
-          <p className="px-1 text-sm text-white/50">Inga egna platser än. Spara din första nedan – trycker du på den får du vägbeskrivning dit i Apple Kartor.</p>
+          <p className="px-1 text-sm text-white/50">Inga egna platser än. Spara din första nedan – trycker du på den får du vägbeskrivning dit.</p>
         )}
       </div>
       <div ref={addRef} className="mt-3">
@@ -399,7 +402,7 @@ export function Places() {
           <div className="space-y-2">
             {tips.map((p) => <PlaceRow key={p.id} p={p} onMore={() => setPlaceOpen(p)} />)}
           </div>
-          <p className="mt-2 px-1 text-[11px] text-white/40">Tryck på en plats för vägbeskrivning i Apple Kartor. Avstånd räknas från {HOME_LABEL} centrum.</p>
+          <p className="mt-2 px-1 text-[11px] text-white/40">Tryck på en plats för vägbeskrivning – i Apple Kartor på iPhone, i Google Maps på datorn. Avstånd räknas från {HOME_LABEL} centrum.</p>
         </>
       )}
 
@@ -478,11 +481,13 @@ export function Places() {
                 </a>
               )}
               <a href={mapsLinkFor(placeOpen)} target="_blank" rel="noreferrer" className="btn-ghost w-full">
-                <MapIcon size={16} /> Visa platsen i Apple Kartor
+                <MapIcon size={16} /> Visa platsen i {mapsAppName()}
               </a>
-              <a href={placeOpen.mapsUrl?.includes('google') ? placeOpen.mapsUrl : googleMapsPlaceUrl(queryFor(placeOpen), '')} target="_blank" rel="noreferrer" className="btn-ghost w-full">
-                <MapIcon size={16} /> Google Maps
-              </a>
+              {isAppleMobile() && (
+                <a href={placeOpen.mapsUrl?.includes('google') ? placeOpen.mapsUrl : googleMapsPlaceUrl(destinationFor(placeOpen), '')} target="_blank" rel="noreferrer" className="btn-ghost w-full">
+                  <MapIcon size={16} /> Google Maps
+                </a>
+              )}
               <button onClick={() => { const p = placeOpen; setPlaceOpen(null); setCheckin({ place: p }); }} className="btn-ghost w-full">
                 <Camera size={16} /> Spara ett minne här
               </button>
