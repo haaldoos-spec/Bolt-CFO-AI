@@ -303,10 +303,29 @@ function CheckinSheet({ open, onClose, initialPlace, questTitle, onSaved }: {
       </button>
 
       <div className="label mb-2">Plats</div>
-      <select value={placeId} onChange={(e) => setPlaceId(e.target.value)} className="mb-4 w-full rounded-2xl border border-white/15 bg-white/5 px-4 py-3.5 text-sm font-semibold outline-none [&>option]:bg-neutral-900">
-        <option value="hemma">🏡 Hemma i {HOME_LABEL}</option>
-        {allPlaces.map((p) => (
-          <option key={p.id} value={p.id}>{p.custom ? '⭐' : CAT_EMOJI[p.category]} {p.name}</option>
+      {/* Mina platser och Hemma som knappar, så de syns direkt */}
+      <div className="mb-2 flex flex-wrap gap-2">
+        {[{ id: 'hemma', label: `🏡 Hemma` }, ...state.myPlaces.map((p) => ({ id: p.id, label: `⭐ ${p.name}` }))].map((o) => (
+          <button
+            key={o.id}
+            type="button"
+            onClick={() => setPlaceId(o.id)}
+            className={`max-w-full truncate rounded-full border px-3.5 py-2 text-sm font-semibold transition active:scale-95 ${placeId === o.id ? 'border-transparent text-ink' : 'border-white/15 bg-white/5 text-white/80'}`}
+            style={placeId === o.id ? { background: 'linear-gradient(120deg,var(--a1),var(--a2))' } : undefined}
+          >
+            {o.label}
+          </button>
+        ))}
+      </div>
+      {!state.myPlaces.length && <p className="mb-2 text-[11px] text-white/45">Dina egna platser visas här när du sparat dem under Platser.</p>}
+      <select
+        value={PLACES.some((p) => p.id === placeId) ? placeId : ''}
+        onChange={(e) => e.target.value && setPlaceId(e.target.value)}
+        className="mb-4 w-full rounded-2xl border border-white/15 bg-white/5 px-4 py-3 text-sm font-semibold outline-none [&>option]:bg-neutral-900"
+      >
+        <option value="">Eller välj bland tipsen…</option>
+        {PLACES.map((p) => (
+          <option key={p.id} value={p.id}>{CAT_EMOJI[p.category]} {p.name}</option>
         ))}
       </select>
 
