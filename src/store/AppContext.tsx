@@ -5,7 +5,8 @@ import type { AppState, CheckIn, CustomPass, Exercise, Place, DisciplineId, DogI
 
 export type GeneratorPreset = { discipline?: DisciplineId | 'mix'; minutes?: number };
 export type PlacesSection = 'platser' | 'bilder' | 'dagbok';
-import { seedState } from '../data/seed';
+import { DEMO_COMPLETED_SENIOR, DEMO_IDS, seedState } from '../data/seed';
+import { QUESTS } from '../data/quests';
 import { parseMapsLink } from '../lib/maps';
 import { DEFAULT_DOGS, OLD_DEFAULT_NAMES, THEMES } from '../data/profiles';
 import { setCustomExercises } from '../data/training';
@@ -91,6 +92,20 @@ function reducer(s: AppState, a: Action): AppState {
   }
 }
 
+/** XP räknat från det användaren faktiskt gjort */
+function recomputeXp(s: AppState): AppState['xp'] {
+  const xp = { senior: 0, puppy: 0 };
+  s.sessions.forEach((x) => x.dogs.forEach((d) => (xp[d] += x.minutes * 2 + (x.ratings[d] ?? 3) * 5)));
+  s.checkins.forEach((c) => c.dogs.forEach((d) => (xp[d] += 15)));
+  s.questsDone.forEach((q) => {
+    const quest = QUESTS.find((x) => x.id === q.questId);
+    if (quest) (q.profile === 'both' ? (['senior', 'puppy'] as DogId[]) : [q.profile]).forEach((d) => (xp[d] += quest.xp));
+  });
+  (['senior', 'puppy'] as DogId[]).forEach((d) => (xp[d] += s.completed[d].length * 25));
+  xp.puppy += (s.puppyGuide ?? []).length * 10;
+  return xp;
+}
+
 /** Uppdaterar sparad data (lokal eller från Claudes lagring) till senaste formatet */
 export function migrate(input: AppState): AppState {
   const s = structuredClone(input) as AppState;
@@ -112,16 +127,17 @@ export function migrate(input: AppState): AppState {
         s.dogs[d].ageLabel = DEFAULT_DOGS[d].ageLabel;
         s.dogs[d].weightKg = DEFAULT_DOGS[d].weightKg;
       });
-      // Demodata v3: Kyle är 4 veckor och flyttar hem den 14 december
-      if ((s.seedVersion ?? 1) < 3) {
-        const seed = seedState();
-        const seedIds = new Set(['s1', 's2', 's3', 's4', 's5', 's6', 'c1', 'c2', 'c3', 'c4', 'c5', 'qd1', 'qd2']);
-        s.sessions = [...seed.sessions, ...s.sessions.filter((x) => !seedIds.has(x.id))];
-        s.checkins = [...seed.checkins, ...s.checkins.filter((x) => !seedIds.has(x.id))];
-        s.questsDone = s.questsDone.filter((x) => !seedIds.has(x.id));
-        s.completed.puppy = [];
-        s.xp.puppy = (s.puppyGuide?.length ?? 0) * 10;
-        s.seedVersion = 3;
+      // v4: ta bort all exempeldata men behåll allt användaren själv lagt in, och räkna om XP
+      if ((s.seedVersion ?? 1) < 4) {
+        s.sessions = s.sessions.filter((x) => !DEMO_IDS.has(x.id));
+        s.checkins = s.checkins.filter((x) => !DEMO_IDS.has(x.id));
+        s.questsDone = s.questsDone.filter((x) => !DEMO_IDS.has(x.id));
+        s.completed = {
+          senior: s.completed.senior.filter((id) => !DEMO_COMPLETED_SENIOR.includes(id)),
+          puppy: s.completed.puppy,
+        };
+        s.xp = recomputeXp(s);
+        s.seedVersion = 4;
       }
       s.myPlaces ??= [];
       // Läs om positionen ur sparade kartlänkar (rättar platser sparade med kartans mittpunkt i stället för platsen)

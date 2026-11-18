@@ -255,7 +255,7 @@ export function Profile() {
         onClick={() => {
           if (confirmReset) {
             dispatch({ type: 'reset' });
-            toast('Demodata återställd');
+            toast('All data är raderad');
             setConfirmReset(false);
           } else {
             setConfirmReset(true);
@@ -264,7 +264,7 @@ export function Profile() {
         }}
         className={`btn-ghost mx-auto mt-6 flex !text-xs ${confirmReset ? '!border-rose-300/50 !text-rose-200' : '!text-white/50'}`}
       >
-        <RotateCcw size={14} /> {confirmReset ? 'Tryck igen för att radera allt' : 'Återställ demodata'}
+        <RotateCcw size={14} /> {confirmReset ? 'Tryck igen – raderar ALLT, även bilder och platser' : 'Radera all data'}
       </button>
     </div>
   );
