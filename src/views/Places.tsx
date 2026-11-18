@@ -27,8 +27,12 @@ const mapsLinkFor = (p: Place) => {
 };
 
 /** Vägbeskrivning dit – det som öppnas när man trycker på en plats */
-const directionsFor = (p: Place, mode: TravelMode = 'driving') =>
-  isAppleMobile() ? appleMapsDirectionsUrl(destinationFor(p), mode) : googleMapsDirectionsUrl(destinationFor(p), mode);
+const directionsFor = (p: Place, mode: TravelMode = 'driving') => {
+  // Kort delningslänk utan position (maps.app.goo.gl / maps.apple/p): öppna länken själv –
+  // den visar exakt rätt plats, och vägbeskrivningen startas därifrån.
+  if (p.custom && p.noCoords && p.mapsUrl) return p.mapsUrl;
+  return isAppleMobile() ? appleMapsDirectionsUrl(destinationFor(p), mode) : googleMapsDirectionsUrl(destinationFor(p), mode);
+};
 
 const distText = (p: Place) => {
   if (p.noCoords) return null;
@@ -171,7 +175,7 @@ function AddFromMaps({ onSaved }: { onSaved: (p: Place) => void }) {
       {parsed && (
         <p className="mt-2 flex items-center gap-1.5 text-xs font-semibold text-emerald-300">
           <Check size={14} /> Länk från {parsed.source === 'apple' ? 'Apple Kartor' : parsed.source === 'google' ? 'Google Maps' : 'webben'}
-          {parsed.lat !== undefined ? ' med position' : ' – öppnas i kartappen'}
+          {parsed.lat !== undefined ? ' med position – vägbeskrivning går direkt dit' : ' (kort länk) – öppnar exakt rätt plats, tryck Vägbeskrivning där'}
         </p>
       )}
 
