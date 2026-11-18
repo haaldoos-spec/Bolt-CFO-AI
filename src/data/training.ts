@@ -27,12 +27,77 @@ export const EQUIPMENT: Record<EquipmentId, Equipment> = {
 };
 
 export const DISCIPLINES: Discipline[] = [
-  { id: 'vardag', name: 'Vardagslydnad', tagline: 'Grunden för ett lugnt liv ihop', goalLabel: 'Startklass Lydnad', icon: 'Home' },
-  { id: 'rally', name: 'Rallylydnad', tagline: 'Skylt för skylt, glädje hela vägen', goalLabel: 'Rally Nybörjarklass', icon: 'Signpost' },
-  { id: 'spar', name: 'Spår', tagline: 'Följ doften steg för steg', goalLabel: 'Anlagsprov Spår', icon: 'Footprints' },
-  { id: 'sok', name: 'Sök', tagline: 'Nosework & doftsök', goalLabel: 'Doftprov NW1', icon: 'Search' },
-  { id: 'agility', name: 'Agility', tagline: 'Valpanpassat – marknivå & kroppskontroll', goalLabel: 'Valpbana (hoppfri)', icon: 'Zap' },
-  { id: 'tricks', name: 'Tricks & Roligt', tagline: 'Hjärngympa och skratt', goalLabel: 'Trickhund Novice', icon: 'Sparkles' },
+  {
+    id: 'vardag', name: 'Vardagslydnad', tagline: 'Grunden för ett lugnt liv ihop', goalLabel: 'Startklass Lydnad', icon: 'Home',
+    rules: {
+      org: 'SKK / Svenska Brukshundklubben (SBK)', period: 'Regler gäller 2023-01-01 – 2026-12-31', official: true,
+      facts: [
+        'Startklass har sex moment: Följsamhet (koeff. 4), Inkallande (3), Sitt under marsch (3), Apportering (3), Fjärrdirigering (2) och Hopp över hinder (2).',
+        'Sittande i grupp ingår i klass 1, inte i startklass.',
+        'Ingen belöning och ingen beröring av hunden när ett moment pågått – bara mellan momenten.',
+        'Tre uppflyttningsresultat i startklass ger lydnadsdiplom (LD Startklass).',
+      ],
+    },
+  },
+  {
+    id: 'rally', name: 'Rallylydnad', tagline: 'Skylt för skylt, glädje hela vägen', goalLabel: 'Rally Nybörjarklass', icon: 'Signpost',
+    rules: {
+      org: 'SKK / Svenska Brukshundklubben (SBK)', period: 'Regler gäller 2023-01-01 – 2026-12-31', official: true,
+      facts: [
+        'Nybörjarklass: 12–15 moment, hunden är kopplad hela banan. Kopplet ska hänga löst.',
+        'Sele är tillåten bara i nybörjarklass (kopplet fäst på ryggen). Från fortsättningsklass går hunden okopplad.',
+        'Du får prata och berömma hela tiden – men ingen godis eller leksak på banan.',
+        'Man startar med 100 poäng och får avdrag. Minst 70 poäng är godkänt; tre godkända (eller 100 poäng en gång) ger uppflyttning.',
+      ],
+    },
+  },
+  {
+    id: 'spar', name: 'Spår', tagline: 'Följ doften steg för steg', goalLabel: 'Viltspårprov anlagsklass', icon: 'Footprints',
+    rules: {
+      org: 'SKK – Regler för viltspårprov', period: 'Regler gäller 2022-01-01 – 2026-12-31', official: true,
+      facts: [
+        'Spåret är 600–700 m och läggs med 2 dl blod och klöv/skank av hjortvilt.',
+        'Anlagsklass: spåret läggs 2–5 timmar före start. Öppen klass: 12–24 timmar (kräver godkänd anlagsklass).',
+        'Max 30 minuter i anlagsklass och spårlina på högst 10 m.',
+        'Anlagsklass bedöms bara godkänd / ej godkänd. Viltspår är retrieverns naturliga gren.',
+        'Spår i bruksprov (SBK, appellklass) är en annan tävlingsform med kortare spår och föremål.',
+      ],
+    },
+  },
+  {
+    id: 'sok', name: 'Sök', tagline: 'Nosework & doftsök', goalLabel: 'Doftprov & NW1', icon: 'Search',
+    rules: {
+      org: 'Svenska Nose Work Klubben (SNWK)', period: 'Regler gäller 2022-01-01 – 2026-12-31', official: true,
+      facts: [
+        'Före första tävlingen krävs godkänt doftprov: hitta eukalyptusdoften i en av 12 behållare inom 3 minuter.',
+        'NW1 har fyra sökmoment: behållarsök, inomhussök, utomhussök och fordonssök – en gömma i varje.',
+        'I behållarsök används kartonger; fordonssök görs på 1–3 fordon. Alla sök tas på tid.',
+        'Hunden ska ha fyllt 12 månader för att tävla.',
+      ],
+    },
+  },
+  {
+    id: 'agility', name: 'Agility', tagline: 'Valpanpassat – marknivå & kroppskontroll', goalLabel: 'Valpbana (hoppfri)', icon: 'Zap',
+    rules: {
+      org: 'Svenska Agilityklubben (SAgiK) / SKK', period: 'Regler gäller 2022–2026', official: true,
+      facts: [
+        'Hunden får tävla först när den fyllt 18 månader.',
+        'Officiell mätning för storleksklass görs tidigast vid 18 månader och slutgiltigt före start efter 24 månader.',
+        'Banorna i appen är inte tävlingsbanor – de är valpanpassade förberedelser utan hopp.',
+      ],
+    },
+  },
+  {
+    id: 'tricks', name: 'Tricks & Roligt', tagline: 'Hjärngympa och skratt', goalLabel: 'Trickhund Novice', icon: 'Sparkles',
+    rules: {
+      org: 'Ingen SKK-gren', period: 'Inofficiellt', official: false,
+      facts: [
+        'Tricks är ingen officiell tävlingsgren hos SKK.',
+        'Trickhundstitlar (t.ex. Novice) delas ut av fristående organisationer via filmade prov.',
+        'Många tricks bygger färdigheter som används i lydnad och rally: backa, stå, apport och handtarget.',
+      ],
+    },
+  },
 ];
 
 export const LEVEL_LABEL = {
@@ -146,18 +211,18 @@ const BASE_EXERCISES: Exercise[] = [
   },
   {
     id: 'v-program-startklass', discipline: 'vardag', level: 'program', title: 'Program: Startklass Lydnad',
-    summary: 'Hela startklassprogrammet i träningsform: platsliggning, linförighet, inkallning, ställande och apport.',
-    suits: ['senior', 'puppy'], minutes: 25, intensity: 2, equipment: ['koppel', 'apport', 'godis', 'koner'],
-    builtFrom: ['v-sitt-stanna', 'v-linforing', 'v-inkallning', 't-apport-grepp'],
+    summary: 'Startklassens sex moment enligt SBK:s regler 2023–2026, i träningsform.',
+    suits: ['senior', 'puppy'], minutes: 25, intensity: 2, equipment: ['koppel', 'apport', 'godis', 'koner', 'hinder'],
+    builtFrom: ['v-linforing', 'v-kedja-inkallning', 'v-sitt-marsch', 'v-apport-lydnad', 'v-fjarr', 'v-hopp'],
     steps: [
-      'Platsliggning 1 min i grupp (träna med den andra hunden bredvid). Fritt följ med vändningar.',
-      'Inkallning från 15 m, sedan ”Ställande under gång”. Belöna mellan momenten i början.',
-      'Apportering av bock på 5 m: utgångsställning, sänd, avlämning i sitt. Avsluta med lek.',
+      'Kör momenten ett och ett med belöning efter varje. Sätt ihop två och två när de sitter.',
+      'Träna tävlingslikt: ingen belöning eller beröring under momentet – bara mellan momenten.',
+      'Avsluta med en genomkörning av hela programmet och stor lek efteråt.',
     ],
-    criteria: ['Klarar alla moment i följd med max 3 belöningar', 'Avlämning utan att tappa bocken'],
+    criteria: ['Alla sex moment i följd med belöning bara mellan momenten', 'Avlämning av apportbocken i handen'],
     labbeHack: {
-      senior: 'Byt ut ställande/sitt-moment mot det som är bekvämt för leden. Tävling är inte målet – glädjen är.',
-      puppy: 'Kör programmet i delar. En valp under 1 år ska inte köra hela program i följd.',
+      senior: 'Hoppet kan sänkas eller hoppas över i träning. Tävling är inte målet – glädjen är.',
+      puppy: 'Kör programmet i delar och vänta med hoppet tills lederna är färdigväxta (ca 12–15 mån).',
     },
   },
 
@@ -211,7 +276,7 @@ const BASE_EXERCISES: Exercise[] = [
   },
   {
     id: 'r-bana-nyborjare', discipline: 'rally', level: 'program', title: 'Bana: Nybörjarklass (12 skyltar)',
-    summary: 'Komplett övningsbana i nybörjarklass – helt med koppel.',
+    summary: 'Övningsbana i nybörjarstil: 12 moment, koppel hela vägen och ingen godis på banan. Momenten är exempel – skyltarna finns i regelboken.',
     suits: ['puppy', 'senior'], minutes: 20, intensity: 2, equipment: ['skyltar', 'koner', 'koppel', 'godis'],
     builtFrom: ['r-fot-vanster', 'r-sitt-ligg', 'r-runt', 'r-kedja-start'],
     steps: [
@@ -263,8 +328,8 @@ const BASE_EXERCISES: Exercise[] = [
     labbeHack: { general: 'Labradorer apporterar gärna – välj om du vill ha markering (ligg) eller apport, och var konsekvent.' },
   },
   {
-    id: 's-anlag', discipline: 'spar', level: 'program', title: 'Anlagsspår 300 m',
-    summary: 'Ett realistiskt anlagsspår med två vinklar, en apport och 30 min liggtid.',
+    id: 's-anlag', discipline: 'spar', level: 'program', title: 'Grundspår 300 m',
+    summary: 'Ett träningsspår med två vinklar och slutföremål – steget före viltspårets 600 m.',
     suits: ['senior', 'puppy'], minutes: 30, intensity: 2, equipment: ['sparlina', 'sele', 'pinne', 'apport', 'godis'],
     builtFrom: ['s-fotsteg', 's-vinkel', 's-apport'],
     steps: [
@@ -316,7 +381,7 @@ const BASE_EXERCISES: Exercise[] = [
     id: 'k-nw1', discipline: 'sok', level: 'program', title: 'Doftprov NW1-simulering',
     summary: 'Fyra sökmoment: behållare, inomhus, utomhus och fordon – som på riktigt prov.',
     suits: ['senior', 'puppy'], minutes: 25, intensity: 1, equipment: ['nosework', 'godis', 'koppel'],
-    builtFrom: ['k-lada', 'k-doft', 'k-rum'],
+    builtFrom: ['k-doftprov', 'k-behallare', 'k-rum', 'k-ute', 'k-fordon'],
     steps: [
       'Behållarsök: 6 kartonger, 1 gömma. Inomhussök: ett rum, 1 gömma.',
       'Utomhussök: 10×10 m yta i trädgården. Fordonssök: gömma vid hjulet på bilen.',

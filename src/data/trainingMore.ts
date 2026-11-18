@@ -113,7 +113,7 @@ export const MORE_EXERCISES: Exercise[] = [
   },
   {
     id: 'v-kedja-ligg', discipline: 'vardag', level: 'kedja', title: 'Kedja: Läggande under gång',
-    summary: 'Fritt följ → ligg under gång → gå runt → hämta upp hunden.',
+    summary: 'Klass 2-moment: följsamhet → ligg under gång → gå runt → hämta upp hunden.',
     suits: ['puppy', 'senior'], minutes: 10, intensity: 2, equipment: ['godis', 'koner'],
     builtFrom: ['v-linforing', 'v-ligg-gang', 'v-fotposition'],
     steps: [
@@ -125,7 +125,7 @@ export const MORE_EXERCISES: Exercise[] = [
   },
   {
     id: 'v-kedja-grupp', discipline: 'vardag', level: 'kedja', title: 'Kedja: Sittande i grupp',
-    summary: 'Hundarna sitter bredvid varandra 1 minut medan förarna står en bit bort.',
+    summary: 'Klass 1-moment: hundarna sitter bredvid varandra 1 minut medan förarna står en bit bort.',
     suits: ['puppy', 'senior'], minutes: 10, intensity: 1, equipment: ['godis'],
     builtFrom: ['v-sitt-stanna', 'v-passivitet'],
     steps: [
@@ -244,7 +244,7 @@ export const MORE_EXERCISES: Exercise[] = [
   },
   {
     id: 'r-bana-fortsattning', discipline: 'rally', level: 'program', title: 'Bana: Mot fortsättningsklass',
-    summary: 'En bana med 15 skyltar utan koppel, inklusive slalom, tempobyten och 270°-svängar.',
+    summary: 'En träningsbana utan koppel med slalom, tempobyten och 270°-svängar – steget efter nybörjarklass.',
     suits: ['puppy', 'senior'], minutes: 25, intensity: 2, equipment: ['skyltar', 'koner', 'godis'],
     builtFrom: ['r-bana-nyborjare', 'r-kedja-slalom', 'r-kedja-position', 'r-hoger'],
     moments: [
@@ -350,26 +350,27 @@ export const MORE_EXERCISES: Exercise[] = [
     criteria: ['Löser båda vinklarna själv', 'Markerar föremålet'],
   },
   {
-    id: 's-viltspar', discipline: 'spar', level: 'program', title: 'Program: Viltspårsinspirerat spår',
-    summary: 'Ett längre spår lagt med vilt-doft (t.ex. blod eller klöv) – en klassisk retrieveruppgift.',
+    id: 's-viltspar', discipline: 'spar', level: 'program', title: 'Program: Viltspårprov anlagsklass',
+    summary: 'Ett spår upplagt som SKK:s viltspårprov i anlagsklass – retrieverns klassiska gren.',
     suits: ['senior', 'puppy'], minutes: 40, intensity: 2, equipment: ['sparlina', 'sele', 'pinne', 'godis'],
-    builtFrom: ['s-kedja-rakt', 's-kedja-vinklar', 's-liggtid', 's-ritual'],
+    builtFrom: ['s-kedja-rakt', 's-kedja-vinklar', 's-liggtid', 's-ritual', 's-lina'],
     moments: [
-      'Spårstart vid markerad ”skottplats”',
-      '400–600 m spår med 2–3 vinklar',
-      'Liggtid minst 2 timmar',
-      'Ett eller två blodbäddar/markeringar på vägen',
-      'Fynd vid slutet (klöv eller skinn) – stor fest',
+      'Spårstart vid markerad skottplats (”påskott”)',
+      '600–700 m spår med blod (2 dl) och klöv/skank av hjortvilt',
+      'Vinklar längs spåret, minst 50 m mellan dem',
+      'Liggtid 2–5 timmar (anlagsklass)',
+      'Spårlina högst 10 m – max 30 minuter',
+      'Fynd vid spårets slut – stor fest',
     ],
     steps: [
-      'Lägg spåret med en spårsko eller droppflaska. Följ jaktklubbens råd för material.',
-      'Låt spåret ligga minst 2 timmar. Värm upp hunden kort.',
-      'Spåra lugnt i lina. Var tyst och låt hunden jobba.',
+      'Lägg spåret med droppflaska eller spårsko enligt reglerna. Bygg upp längden i etapper: 200 → 400 → 600 m.',
+      'Låt spåret ligga 2–5 timmar. Värm upp hunden kort och gör din spårritual.',
+      'Spåra lugnt i högst 10 m lina. Var tyst, låt hunden jobba och håll koll på tiden.',
     ],
-    criteria: ['Hela spåret med max 1 hjälp', 'Hunden hittar fyndet'],
+    criteria: ['600 m spår inom 30 minuter', 'Max 1 hjälp', 'Hunden hittar fyndet'],
     labbeHack: {
-      general: 'Labradorer är avlade som apporterande jakthundar och har ofta fantastiskt anlag för viltspår. Prata med en lokal jaktklubb för att prova på riktigt.',
-      senior: 'Senioren kan spåra i lugn takt långt upp i åren – välj lättgången mark och kortare sträcka.',
+      general: 'Labradorer är avlade som apporterande jakthundar och har ofta fina anlag för viltspår. Prata med en lokal jaktklubb eller rasklubb för att prova på ett officiellt prov.',
+      senior: 'Senioren kan spåra i lugn takt långt upp i åren – välj lättgången mark och bygg upp längden försiktigt.',
     },
   },
 
@@ -703,17 +704,94 @@ export const MORE_EXERCISES: Exercise[] = [
     criteria: ['Alla 5 moment i följd'],
     pairTip: 'I Dual Mode: senioren hämtar tofflor, valpen städar leksaker – sedan byter ni.',
   },
+  // ═════════════ Tillägg efter jämförelse med officiella regler ═════════════
+  {
+    id: 'v-sitt-marsch', discipline: 'vardag', level: 'byggsten', title: 'Sitt under marsch',
+    summary: 'Startklassmoment: hunden sätter sig på signal medan du fortsätter gå.',
+    suits: ['puppy', 'senior'], minutes: 8, intensity: 1, equipment: ['godis', 'koppel'],
+    steps: [
+      'Gå långsamt, stanna och säg ”sitt”. Belöna snabbt i positionen.',
+      'Säg ”sitt” medan du går och ta ett halvt steg till. Gå tillbaka och belöna.',
+      'Bygg till 5–10 steg innan du vänder och hämtar upp hunden i fotposition.',
+    ],
+    criteria: ['Sätter sig direkt på signal', 'Sitter kvar när du går 10 steg'],
+  },
+  {
+    id: 'v-fjarr', discipline: 'vardag', level: 'byggsten', title: 'Fjärrdirigering',
+    summary: 'Startklassmoment: hunden byter position (sitt/ligg/stå) på avstånd utan att komma fram.',
+    suits: ['puppy', 'senior'], minutes: 8, intensity: 1, equipment: ['godis', 'pall'],
+    steps: [
+      'Stå nära med hunden framför dig. Byt sitt ↔ ligg med signal, belöna varje byte.',
+      'Lägg en låg pall eller bom framför hundens framtassar så den inte kliver framåt.',
+      'Ta ett steg i taget bakåt. Belöna genom att gå fram till hunden – kasta inte godiset.',
+    ],
+    criteria: ['Två positionsbyten från 3 m', 'Hunden flyttar sig inte framåt'],
+    labbeHack: { senior: 'Välj mjukt underlag och få byten. Ligg ↔ sitt är skonsammare än många stå-byten.' },
+  },
+  {
+    id: 'v-apport-lydnad', discipline: 'vardag', level: 'byggsten', title: 'Apportering av bock',
+    summary: 'Startklassmoment: hunden väntar, hämtar apportbocken och lämnar den i handen.',
+    suits: ['puppy', 'senior'], minutes: 8, intensity: 1, equipment: ['bock', 'godis'],
+    builtFrom: ['t-apport-grepp'],
+    steps: [
+      'Hunden sitter i fot. Lägg bocken 2 m bort. Skicka med ”apport” och belöna avlämningen.',
+      'Kasta bocken och låt hunden vänta tills du skickar.',
+      'Bygg avståndet och avsluta med inspring till fot innan ”loss”.',
+    ],
+    criteria: ['Väntar tills du skickar', 'Lugnt grepp och avlämning i handen'],
+    labbeHack: { general: 'Labradorer tar gärna bocken – men tuggar ofta. Belöna stilla grepp redan i byggstenen ”Mjukt grepp”.' },
+  },
+  {
+    id: 'v-hopp', discipline: 'vardag', level: 'byggsten', title: 'Hopp över hinder',
+    summary: 'Startklassmoment: hunden hoppar över ett hinder på signal. Bara för vuxna hundar.',
+    suits: ['senior'], minutes: 6, intensity: 2, equipment: ['hinder', 'godis'],
+    steps: [
+      'Börja med en bom på marken. Hunden kliver över mot en belöning.',
+      'Höj försiktigt några centimeter i taget. Belöna på andra sidan.',
+      'Skicka hunden över från fotposition och kalla tillbaka.',
+    ],
+    criteria: ['Hoppar på signal utan att riva'],
+    labbeHack: {
+      senior: 'Håll hinderhöjden låg och mjukt underlag vid landningen. Hoppa över momentet om senioren är stel.',
+      puppy: 'Inte för valpen – vänta tills lederna är färdigväxta (ca 12–15 mån) och fråga gärna veterinären.',
+    },
+  },
+  {
+    id: 'r-utan-godis', discipline: 'rally', level: 'byggsten', title: 'Belöning efter mål',
+    summary: 'På tävling får du inte ha godis eller leksak på banan. Träna så att belöningen kommer efter mål.',
+    suits: ['puppy', 'senior'], minutes: 8, intensity: 1, equipment: ['godis', 'skyltar'],
+    steps: [
+      'Lägg godiset i en skål vid målet. Kör 2–3 skyltar och spring till skålen.',
+      'Öka antalet skyltar mellan belöningarna. Beröm muntligt hela vägen – det är tillåtet.',
+      'Kör en hel bana med tomma fickor och fest vid målet.',
+    ],
+    criteria: ['Hela banan utan godis på dig', 'Hunden håller glädjen till mål'],
+  },
+  {
+    id: 'k-doftprov', discipline: 'sok', level: 'kedja', title: 'Doftprovet – 12 behållare',
+    summary: 'Som SNWK:s doftprov: hitta eukalyptus i en av 12 behållare inom 3 minuter.',
+    suits: ['senior', 'puppy'], minutes: 10, intensity: 1, equipment: ['nosework', 'godis'],
+    builtFrom: ['k-doft', 'k-markering', 'k-behallare'],
+    moments: ['12 likadana behållare i rad eller ring', 'Eukalyptus i en av dem', 'Hunden markerar inom 3 minuter', 'Föraren säger ”Hittat!”'],
+    steps: [
+      'Ställ 12 likadana behållare. Doft i en – byt plats på den varje gång.',
+      'Gå med i lugn takt och låt hunden jobba. Säg ”Hittat!” när hunden markerar.',
+      'Ta tid. Klarar hunden det under 3 minuter är ni redo för provet.',
+    ],
+    criteria: ['Rätt behållare inom 3 minuter', 'Ingen falsk markering'],
+  },
+
 ];
 
 /** Moment i följd för de ursprungliga programmen */
 export const BASE_PROGRAM_MOMENTS: Record<string, string[]> = {
   'v-program-startklass': [
-    'Sittande i grupp, 1 minut',
-    'Linförighet (fritt följ) med vändningar',
-    'Läggande under gång',
-    'Inkallning från ca 15 m',
-    'Ställande under gång',
-    'Apportering av bock',
+    'Följsamhet – hunden följer i fot med vändningar och tempobyten (koeff. 4)',
+    'Inkallande – hunden kallas in och går in i fotposition (koeff. 3)',
+    'Sitt under marsch – hunden sätter sig medan du går vidare (koeff. 3)',
+    'Apportering – hämta och lämna apportbocken (koeff. 3)',
+    'Fjärrdirigering – positionsbyten på avstånd (koeff. 2)',
+    'Hopp över hinder (koeff. 2)',
   ],
   'r-bana-nyborjare': [
     'Start – sitt i fot',
@@ -730,7 +808,7 @@ export const BASE_PROGRAM_MOMENTS: Record<string, string[]> = {
     'Mål',
   ],
   's-anlag': ['Spårstart vid pinne', '100 m rakt', 'Vinkel', '100 m med föremål', 'Vinkel', '100 m till slutföremål'],
-  'k-nw1': ['Behållarsök – 1 gömma', 'Inomhussök – 1 gömma', 'Utomhussök – 1 gömma', 'Fordonssök – 1 gömma'],
+  'k-nw1': ['Behållarsök – kartonger, 1 gömma', 'Inomhussök – 1 gömma', 'Utomhussök – 1 gömma', 'Fordonssök – 1–3 fordon, 1 gömma'],
   'a-valpbana': ['Tunnel', 'Runt kon', 'Balansplatta', 'Kliv över 2 bommar på marken', 'Target – stanna'],
   't-novice': ['Tass', 'Snurr', 'Städa', 'Buga', 'Pang'],
 };

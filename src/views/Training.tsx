@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { ArrowLeft, Check, ChevronRight, Clock, Flag, Layers, Lightbulb, Link2, PawPrint, Puzzle, Sparkles, Target, Timer, Trophy, Users } from 'lucide-react';
+import { ArrowLeft, Check, ChevronRight, Scale, Clock, Flag, Layers, Lightbulb, Link2, PawPrint, Puzzle, Sparkles, Target, Timer, Trophy, Users } from 'lucide-react';
 import type { DisciplineId, DogId, Exercise, ExerciseLevel } from '../types';
 import { useApp } from '../store/AppContext';
 import { DISCIPLINES, EQUIPMENT, EXERCISES, LEVEL_LABEL, disciplineById, exerciseById } from '../data/training';
@@ -209,6 +209,25 @@ function DisciplineDetail({ id, onBack, onOpen }: { id: DisciplineId; onBack: ()
           })}
         </div>
       </div>
+
+      {d.rules && (
+        <details className="glass group mt-3 p-4">
+          <summary className="flex cursor-pointer list-none items-center gap-2 text-sm font-bold">
+            <Scale size={16} className="text-[var(--a2)]" />
+            <span className="flex-1">{d.rules.official ? 'Tävlingsregler i korthet' : 'Om grenen'}</span>
+            <ChevronRight size={16} className="text-white/50 transition group-open:rotate-90" />
+          </summary>
+          <div className="mt-3 text-[11px] font-semibold text-white/45">{d.rules.org} · {d.rules.period}</div>
+          <ul className="mt-2 space-y-2">
+            {d.rules.facts.map((f) => (
+              <li key={f} className="flex gap-2 text-[13.5px] leading-snug text-white/80">
+                <Check size={15} className="mt-0.5 shrink-0 text-emerald-300" /> {f}
+              </li>
+            ))}
+          </ul>
+          {d.rules.official && <p className="mt-3 text-[11px] leading-relaxed text-white/40">Sammanfattning – kontrollera alltid aktuell regelbok före tävling. Nya regler kan gälla från 2027.</p>}
+        </details>
+      )}
 
       <div className="mt-5 flex items-center gap-2 px-1 text-[11px] font-semibold text-white/50">
         <Puzzle size={14} /> Byggstenar <ChevronRight size={12} /> <Link2 size={14} /> Mini-kedjor <ChevronRight size={12} /> <Trophy size={14} /> Program

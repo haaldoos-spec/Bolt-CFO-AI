@@ -43,6 +43,8 @@ export interface Discipline {
   tagline: string;
   goalLabel: string;
   icon: string;
+  /** Officiella regler i korthet (jämfört mot SKK/SBK/SNWK/SAgiK) */
+  rules?: { org: string; period: string; facts: string[]; official: boolean };
 }
 
 export interface Quest {
