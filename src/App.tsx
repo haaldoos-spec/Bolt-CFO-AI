@@ -4,6 +4,7 @@ import { BottomNav } from './components/BottomNav';
 import { Background, Confetti, Toast } from './components/ui';
 import { SessionFlow } from './components/SessionFlow';
 import { PassBuilder, PassDraftPill } from './components/PassBuilder';
+import { ExerciseEditor } from './components/ExerciseEditor';
 import { Home } from './views/Home';
 import { Places } from './views/Places';
 import { Training } from './views/Training';
@@ -27,6 +28,7 @@ export default function App() {
       <SessionFlow />
       <PassBuilder />
       <PassDraftPill />
+      <ExerciseEditor />
       <Toast />
       <Confetti />
     </>

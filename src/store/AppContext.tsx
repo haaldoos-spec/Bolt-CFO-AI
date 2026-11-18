@@ -1,13 +1,14 @@
 import { createContext, useContext, useEffect, useMemo, useReducer, useRef, useState, type ReactNode } from 'react';
 import { startSync, type SyncHandle, type SyncStatus } from '../lib/sync';
 import type { SessionPlan } from '../lib/session';
-import type { AppState, CheckIn, CustomPass, Place, DisciplineId, DogId, DogInfo, ProfileId, SessionRecord, TabId } from '../types';
+import type { AppState, CheckIn, CustomPass, Exercise, Place, DisciplineId, DogId, DogInfo, ProfileId, SessionRecord, TabId } from '../types';
 
 export type GeneratorPreset = { discipline?: DisciplineId | 'mix'; minutes?: number };
 export type PlacesSection = 'platser' | 'bilder' | 'dagbok';
 import { seedState } from '../data/seed';
 import { parseMapsLink } from '../lib/maps';
 import { DEFAULT_DOGS, OLD_DEFAULT_NAMES, THEMES } from '../data/profiles';
+import { setCustomExercises } from '../data/training';
 
 type Action =
   | { type: 'xp'; dogs: DogId[]; amount: number }
@@ -23,7 +24,9 @@ type Action =
   | { type: 'reset' }
   | { type: 'replace'; state: AppState }
   | { type: 'savePass'; pass: CustomPass }
-  | { type: 'deletePass'; id: string };
+  | { type: 'deletePass'; id: string }
+  | { type: 'saveExercise'; exercise: Exercise }
+  | { type: 'deleteExercise'; id: string };
 
 const KEY = 'labbeliv.state.v1';
 
@@ -75,6 +78,16 @@ function reducer(s: AppState, a: Action): AppState {
     }
     case 'deletePass':
       return { ...s, customPasses: (s.customPasses ?? []).filter((p) => p.id !== a.id) };
+    case 'saveExercise': {
+      const list = s.customExercises ?? [];
+      return { ...s, customExercises: list.some((e) => e.id === a.exercise.id) ? list.map((e) => (e.id === a.exercise.id ? a.exercise : e)) : [...list, a.exercise] };
+    }
+    case 'deleteExercise':
+      return {
+        ...s,
+        customExercises: (s.customExercises ?? []).filter((e) => e.id !== a.id),
+        customPasses: (s.customPasses ?? []).map((p) => ({ ...p, items: p.items.filter((it) => it.exerciseId !== a.id) })),
+      };
   }
 }
 
@@ -119,6 +132,7 @@ export function migrate(input: AppState): AppState {
       });
       s.puppyGuide ??= [];
       s.customPasses ??= [];
+      s.customExercises ??= [];
       return s;
 }
 
@@ -162,7 +176,12 @@ interface Ctx {
   setPlanToRun: (p: SessionPlan | null) => void;
   planToRate: SessionPlan | null;
   setPlanToRate: (p: SessionPlan | null) => void;
+  /** Redigerare för egna övningar */
+  exerciseEditor: ExerciseEditorState | null;
+  setExerciseEditor: (v: ExerciseEditorState | null) => void;
 }
+
+export type ExerciseEditorState = { exercise?: Exercise; discipline?: DisciplineId; addToDraft?: boolean };
 
 const AppCtx = createContext<Ctx | null>(null);
 
@@ -186,9 +205,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [builderOpen, setBuilderOpen] = useState(false);
   const [planToRun, setPlanToRun] = useState<SessionPlan | null>(null);
   const [planToRate, setPlanToRate] = useState<SessionPlan | null>(null);
+  const [exerciseEditor, setExerciseEditor] = useState<ExerciseEditorState | null>(null);
   const syncRef = useRef<SyncHandle | null>(null);
   const stateRef = useRef(state);
   stateRef.current = state;
+  // Egna övningar görs tillgängliga för alla listor och pass
+  setCustomExercises(state.customExercises ?? []);
 
   // Synka med Claudes lagring (privat per konto) när appen körs inne i Claude
   useEffect(() => {
@@ -272,8 +294,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
       setPlanToRun,
       planToRate,
       setPlanToRate,
+      exerciseEditor,
+      setExerciseEditor,
     }),
-    [state, profile, tab, toastMsg, pendingCheckin, celebrate, generator, syncStatus, placesSection, passDraft, builderOpen, planToRun, planToRate],
+    [state, profile, tab, toastMsg, pendingCheckin, celebrate, generator, syncStatus, placesSection, passDraft, builderOpen, planToRun, planToRate, exerciseEditor],
   );
 
   return <AppCtx.Provider value={value}>{children}</AppCtx.Provider>;

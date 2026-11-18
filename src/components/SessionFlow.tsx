@@ -278,7 +278,7 @@ function Runner({ plan, onClose, onFinish }: { plan: SessionPlan; onClose: () =>
             </button>
             {showHow && (
               <ol className="glass mt-2 animate-rise space-y-3 p-4 text-sm text-white/80">
-                {ex.steps.map((s, k) => (
+                {ex.steps.filter(Boolean).map((s, k) => (
                   <li key={k} className="flex gap-3">
                     <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-white/15 text-xs font-bold">{k + 1}</span>
                     {s}

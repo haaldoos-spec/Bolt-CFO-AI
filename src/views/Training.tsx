@@ -1,8 +1,8 @@
 import { useMemo, useState } from 'react';
-import { ArrowLeft, Check, ChevronRight, ListPlus, Scale, Clock, Flag, Layers, Lightbulb, Link2, PawPrint, Puzzle, Sparkles, Target, Timer, Trophy, Users } from 'lucide-react';
+import { ArrowLeft, Check, ChevronRight, ListPlus, Pencil, Plus, Scale, Clock, Flag, Layers, Lightbulb, Link2, PawPrint, Puzzle, Sparkles, Target, Timer, Trophy, Users } from 'lucide-react';
 import type { DisciplineId, DogId, Exercise, ExerciseLevel } from '../types';
 import { useApp } from '../store/AppContext';
-import { DISCIPLINES, EQUIPMENT, EXERCISES, LEVEL_LABEL, disciplineById, exerciseById } from '../data/training';
+import { DISCIPLINES, EQUIPMENT, EXERCISES, LEVEL_LABEL, allExercises, disciplineById, exerciseById } from '../data/training';
 import { dogsOf } from '../data/profiles';
 import { disciplineProgress } from '../lib/coach';
 import { PuppyGuideCard } from '../components/PuppyGuide';
@@ -42,7 +42,7 @@ function CheckButton({ dog, ex }: { dog: DogId; ex: Exercise }) {
 }
 
 export function ExerciseSheet({ ex, onClose, onOpen }: { ex: Exercise | null; onClose: () => void; onOpen: (e: Exercise) => void }) {
-  const { profile, state, openGenerator } = useApp();
+  const { profile, state, openGenerator, setExerciseEditor } = useApp();
   const addToPass = useAddToPass();
   if (!ex) return null;
   const dogs = dogsOf(profile).filter((d) => ex.suits.includes(d));
@@ -56,6 +56,7 @@ export function ExerciseSheet({ ex, onClose, onOpen }: { ex: Exercise | null; on
   return (
     <Sheet open onClose={onClose}>
       <div className="mb-1 flex flex-wrap items-center gap-2">
+        {ex.custom && <span className="chip !text-amber-200">✏️ Egen övning</span>}
         <span className="chip"><LIcon size={12} /> {LEVEL_LABEL[ex.level]}</span>
         <span className="chip">{disciplineById(ex.discipline).name}</span>
         <span className="chip"><Clock size={12} /> {ex.minutes} min</span>
@@ -96,7 +97,7 @@ export function ExerciseSheet({ ex, onClose, onOpen }: { ex: Exercise | null; on
         </div>
       )}
 
-      <div className="label mb-2 mt-6">Utrustning</div>
+      {ex.equipment.length > 0 && <div className="label mb-2 mt-6">Utrustning</div>}
       <div className="grid grid-cols-3 gap-2">
         {ex.equipment.map((id) => {
           const Icon = EQUIP_ICONS[id];
@@ -109,10 +110,10 @@ export function ExerciseSheet({ ex, onClose, onOpen }: { ex: Exercise | null; on
         })}
       </div>
 
-      <div className="label mb-3 mt-6">Inlärning i 3 steg</div>
+      <div className="label mb-3 mt-6">{ex.steps.filter(Boolean).length > 1 ? `Inlärning i ${ex.steps.filter(Boolean).length} steg` : 'Så gör du'}</div>
       <ol className="relative space-y-4 pl-1">
         <span className="absolute bottom-4 left-[19px] top-4 w-px bg-gradient-to-b from-[var(--a1)] to-[var(--a2)] opacity-40" />
-        {ex.steps.map((s, i) => (
+        {ex.steps.filter(Boolean).map((s, i) => (
           <li key={i} className="relative flex gap-3.5">
             <span className="relative z-10 grid h-9 w-9 shrink-0 place-items-center rounded-full text-sm font-extrabold text-ink" style={{ background: 'linear-gradient(135deg,var(--a1),var(--a2))' }}>
               {i + 1}
@@ -122,14 +123,16 @@ export function ExerciseSheet({ ex, onClose, onOpen }: { ex: Exercise | null; on
         ))}
       </ol>
 
-      <div className="glass mt-6 p-4">
-        <div className="mb-2 flex items-center gap-2 text-sm font-bold"><Target size={16} className="text-[var(--a2)]" /> Målbild – när sitter den?</div>
-        <ul className="space-y-1.5">
-          {ex.criteria.map((c) => (
-            <li key={c} className="flex gap-2 text-sm text-white/75"><Check size={16} className="mt-0.5 shrink-0 text-emerald-300" /> {c}</li>
-          ))}
-        </ul>
-      </div>
+      {ex.criteria.length > 0 && (
+        <div className="glass mt-6 p-4">
+          <div className="mb-2 flex items-center gap-2 text-sm font-bold"><Target size={16} className="text-[var(--a2)]" /> Målbild – när sitter den?</div>
+          <ul className="space-y-1.5">
+            {ex.criteria.map((c) => (
+              <li key={c} className="flex gap-2 text-sm text-white/75"><Check size={16} className="mt-0.5 shrink-0 text-emerald-300" /> {c}</li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       {hacks.length > 0 && (
         <div className="mt-4 space-y-2">
@@ -165,7 +168,12 @@ export function ExerciseSheet({ ex, onClose, onOpen }: { ex: Exercise | null; on
         )}
       </div>
 
-      <button onClick={() => addToPass(ex)} className="btn-accent mt-5 w-full">
+      {ex.custom && (
+        <button onClick={() => { onClose(); setExerciseEditor({ exercise: ex }); }} className="btn-ghost mt-5 w-full">
+          <Pencil size={16} /> Redigera övningen
+        </button>
+      )}
+      <button onClick={() => addToPass(ex)} className={`btn-accent w-full ${ex.custom ? 'mt-2' : 'mt-5'}`}>
         <ListPlus size={18} /> Lägg till i eget pass
       </button>
       <button onClick={() => { onClose(); openGenerator({ discipline: ex.discipline, minutes: 15 }); }} className="btn-ghost mt-2 w-full">
@@ -176,11 +184,11 @@ export function ExerciseSheet({ ex, onClose, onOpen }: { ex: Exercise | null; on
 }
 
 function DisciplineDetail({ id, onBack, onOpen }: { id: DisciplineId; onBack: () => void; onOpen: (e: Exercise) => void }) {
-  const { profile, state } = useApp();
+  const { profile, state, setExerciseEditor } = useApp();
   const d = disciplineById(id);
   const dogs = dogsOf(profile);
   const Icon = ICONS[d.icon] ?? Sparkles;
-  const exercises = EXERCISES.filter((e) => e.discipline === id);
+  const exercises = allExercises().filter((e) => e.discipline === id);
   const levels: ExerciseLevel[] = ['byggsten', 'kedja', 'program'];
 
   return (
@@ -264,6 +272,7 @@ function DisciplineDetail({ id, onBack, onOpen }: { id: DisciplineId; onBack: ()
                         <span>{ex.minutes} min</span>
                         <span>· {ex.equipment.length} redskap</span>
                         {ex.labbeHack && <span className="font-bold text-amber-200/90">· Labbe-Hack</span>}
+                        {ex.custom && <span className="font-bold text-amber-200/90">· Egen</span>}
                         {!relevant.length && <span className="text-rose-300/80">· ej för vald hund</span>}
                       </div>
                     </div>
@@ -277,6 +286,13 @@ function DisciplineDetail({ id, onBack, onOpen }: { id: DisciplineId; onBack: ()
           </div>
         );
       })}
+
+      <button
+        onClick={() => setExerciseEditor({ discipline: id })}
+        className="mt-6 flex w-full items-center justify-center gap-2 rounded-3xl border border-dashed border-white/25 bg-white/[0.03] py-4 text-sm font-semibold text-white/80 active:scale-[.98]"
+      >
+        <Plus size={18} /> Skapa egen övning i {d.name.toLowerCase()}
+      </button>
     </div>
   );
 }
@@ -325,7 +341,7 @@ export function Training() {
               const Icon = ICONS[d.icon] ?? Sparkles;
               const pr = dogs.map((dog) => disciplineProgress(state, dog, d.id));
               const avg = pr.reduce((a, b) => a + b, 0) / pr.length;
-              const count = EXERCISES.filter((e) => e.discipline === d.id).length;
+              const count = allExercises().filter((e) => e.discipline === d.id).length;
               return (
                 <button key={d.id} onClick={() => setDisc(d.id)} className="glass flex animate-rise flex-col p-4 text-left transition active:scale-95" style={{ animationDelay: `${k * 50}ms` }}>
                   <div className="mb-4 flex items-start justify-between">

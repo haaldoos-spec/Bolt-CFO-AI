@@ -602,7 +602,15 @@ export const EXERCISES: Exercise[] = [
   ...SPORT_EXERCISES,
 ];
 
-export const exerciseById = (id: string) => EXERCISES.find((e) => e.id === id);
+/** Egna övningar (från användarens data) – sätts av AppProvider */
+let customExercises: Exercise[] = [];
+export const setCustomExercises = (list: Exercise[]) => {
+  customExercises = list;
+};
+/** Inbyggda + egna övningar */
+export const allExercises = () => (customExercises.length ? [...EXERCISES, ...customExercises] : EXERCISES);
+
+export const exerciseById = (id: string) => allExercises().find((e) => e.id === id);
 export const disciplineById = (id: DisciplineId) => DISCIPLINES.find((d) => d.id === id)!;
 
 /** Uppvärmning & nedvarvning för pass-generatorn */

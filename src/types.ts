@@ -35,6 +35,8 @@ export interface Exercise {
   /** För program: momenten i ordning */
   moments?: string[];
   pairTip?: string;
+  /** Egen övning skapad i appen */
+  custom?: boolean;
 }
 
 export interface Discipline {
@@ -151,6 +153,8 @@ export interface AppState {
   puppyGuide: string[];
   /** Egna pass som användaren byggt */
   customPasses?: CustomPass[];
+  /** Egna övningar som användaren skapat */
+  customExercises?: Exercise[];
   /** Version av demodatan, för migrering */
   seedVersion?: number;
   questsDone: { id: string; questId: string; date: string; profile: ProfileId }[];

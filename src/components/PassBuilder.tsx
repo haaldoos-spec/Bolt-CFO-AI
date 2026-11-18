@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { ArrowDown, ArrowUp, Check, ClipboardCheck, ListPlus, Minus, Play, Plus, Save, Search, Trash2, X } from 'lucide-react';
 import type { CustomPass, DisciplineId, DogId, Exercise } from '../types';
 import { useApp } from '../store/AppContext';
-import { DISCIPLINES, EXERCISES, LEVEL_LABEL, disciplineById, exerciseById } from '../data/training';
+import { DISCIPLINES, LEVEL_LABEL, allExercises, disciplineById, exerciseById } from '../data/training';
 import { dogsOf } from '../data/profiles';
 import { fmt, planFromCustom } from '../lib/session';
 import { Avatar, Sheet } from './ui';
@@ -48,17 +48,17 @@ export function PassDraftPill() {
   );
 }
 
-function ExercisePicker({ open, onClose, dogs, onAdd, addedIds }: { open: boolean; onClose: () => void; dogs: DogId[]; onAdd: (e: Exercise) => void; addedIds: string[] }) {
+function ExercisePicker({ open, onClose, dogs, onAdd, addedIds, onCreate }: { open: boolean; onClose: () => void; dogs: DogId[]; onAdd: (e: Exercise) => void; addedIds: string[]; onCreate: () => void }) {
   const [q, setQ] = useState('');
   const [disc, setDisc] = useState<DisciplineId | 'alla'>('alla');
   const list = useMemo(() => {
     const t = q.trim().toLowerCase();
-    return EXERCISES.filter(
+    return allExercises().filter(
       (e) =>
         (disc === 'alla' || e.discipline === disc) &&
         e.suits.some((d) => dogs.includes(d)) &&
         (!t || e.title.toLowerCase().includes(t) || e.summary.toLowerCase().includes(t)),
-    );
+    ).sort((a, b) => Number(!!b.custom) - Number(!!a.custom));
   }, [q, disc, dogs]);
   return (
     <Sheet open={open} onClose={onClose} title="Lägg till övningar">
@@ -84,6 +84,9 @@ function ExercisePicker({ open, onClose, dogs, onAdd, addedIds }: { open: boolea
           </button>
         ))}
       </div>
+      <button onClick={onCreate} className="mb-3 flex w-full items-center justify-center gap-2 rounded-2xl border border-dashed border-amber-200/40 bg-amber-300/[0.07] py-3 text-sm font-semibold text-amber-100 active:scale-[.98]">
+        <Plus size={16} /> Skapa egen övning
+      </button>
       <div className="space-y-1.5">
         {list.map((e) => {
           const n = addedIds.filter((x) => x === e.id).length;
@@ -91,7 +94,7 @@ function ExercisePicker({ open, onClose, dogs, onAdd, addedIds }: { open: boolea
             <button key={e.id} onClick={() => onAdd(e)} className="glass flex w-full items-center gap-3 !rounded-2xl p-3 text-left active:scale-[.99]">
               <div className="min-w-0 flex-1">
                 <div className="truncate text-sm font-semibold">{e.title}</div>
-                <div className="truncate text-[11px] text-white/50">{disciplineById(e.discipline).name} · {LEVEL_LABEL[e.level]} · {e.minutes} min</div>
+                <div className="truncate text-[11px] text-white/50">{e.custom ? '✏️ Egen · ' : ''}{disciplineById(e.discipline).name} · {LEVEL_LABEL[e.level]} · {e.minutes} min</div>
               </div>
               <span className={`grid h-8 w-8 shrink-0 place-items-center rounded-full ${n ? 'text-ink' : 'bg-white/10'}`} style={n ? { background: 'linear-gradient(135deg,var(--a1),var(--a2))' } : undefined}>
                 {n ? (n > 1 ? <span className="text-xs font-extrabold">{n}</span> : <Check size={16} strokeWidth={3} />) : <Plus size={16} />}
@@ -108,7 +111,7 @@ function ExercisePicker({ open, onClose, dogs, onAdd, addedIds }: { open: boolea
 
 /** Bygg, spara, starta eller logga ett eget pass */
 export function PassBuilder() {
-  const { state, dispatch, passDraft, setPassDraft, builderOpen, setBuilderOpen, setPlanToRun, setPlanToRate, toast } = useApp();
+  const { state, dispatch, passDraft, setPassDraft, builderOpen, setBuilderOpen, setPlanToRun, setPlanToRate, toast, setExerciseEditor } = useApp();
   const [picker, setPicker] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   if (!passDraft) return null;
@@ -295,6 +298,7 @@ export function PassBuilder() {
         onClose={() => setPicker(false)}
         dogs={p.dogs}
         addedIds={p.items.map((x) => x.exerciseId)}
+        onCreate={() => { setPicker(false); setExerciseEditor({ addToDraft: true }); }}
         onAdd={(e) => set({ items: [...p.items, { id: crypto.randomUUID(), exerciseId: e.id, minutes: Math.min(10, e.minutes) }] })}
       />
     </>

@@ -1,5 +1,5 @@
 import type { CustomPass, DisciplineId, DogId, Exercise } from '../types';
-import { COOLDOWNS, EXERCISES, WARMUPS } from '../data/training';
+import { COOLDOWNS, WARMUPS, allExercises } from '../data/training';
 
 export type StepKind = 'warmup' | 'work' | 'rest' | 'cooldown';
 
@@ -33,7 +33,7 @@ const shuffle = <T,>(a: T[]) => {
 };
 
 const poolFor = (dog: DogId, discipline: DisciplineId | 'mix', minutes: number): Exercise[] => {
-  let pool = EXERCISES.filter((e) => e.suits.includes(dog) && (discipline === 'mix' || e.discipline === discipline));
+  let pool = allExercises().filter((e) => e.suits.includes(dog) && (discipline === 'mix' || e.discipline === discipline));
   pool = pool.filter((e) => e.level !== 'program' || minutes >= 45);
   if (dog === 'senior') pool = pool.filter((e) => e.intensity <= 2);
   return shuffle(pool).sort((a, b) => (a.level === 'program' ? 1 : 0) - (b.level === 'program' ? 1 : 0));
@@ -112,7 +112,7 @@ export function buildSession(dogs: DogId[], discipline: DisciplineId | 'mix', mi
     seconds: coolSec + Math.max(0, left),
   });
 
-  const workEx = steps.filter((s) => s.exerciseId).map((s) => EXERCISES.find((e) => e.id === s.exerciseId)!);
+  const workEx = steps.filter((s) => s.exerciseId).map((s) => allExercises().find((e) => e.id === s.exerciseId)!);
   const avg = workEx.reduce((a, e) => a + e.intensity, 0) / Math.max(1, workEx.length);
   const intensity = (Math.round(avg + (minutes >= 45 ? 0.5 : 0)) || 1) as 1 | 2 | 3;
 
@@ -133,7 +133,7 @@ export function planFromCustom(pass: CustomPass): SessionPlan {
     steps.push({ kind: 'warmup', title: 'Uppvärmning', detail: list.join(' · '), seconds: (hasSenior ? 5 : 3) * 60 });
   }
   pass.items.forEach((it, i) => {
-    const ex = EXERCISES.find((e) => e.id === it.exerciseId);
+    const ex = allExercises().find((e) => e.id === it.exerciseId);
     if (!ex) return;
     const dog = it.dog ?? (dual ? dogs[i % 2] : dogs[0]);
     steps.push({
@@ -153,7 +153,7 @@ export function planFromCustom(pass: CustomPass): SessionPlan {
     const list = hasPuppy && !hasSenior ? COOLDOWNS.puppy : COOLDOWNS.senior;
     steps.push({ kind: 'cooldown', title: 'Nedvarvning', detail: list.join(' · '), seconds: 3 * 60 });
   }
-  const exs = pass.items.map((it) => EXERCISES.find((e) => e.id === it.exerciseId)).filter(Boolean) as Exercise[];
+  const exs = pass.items.map((it) => allExercises().find((e) => e.id === it.exerciseId)).filter(Boolean) as Exercise[];
   const avg = exs.reduce((a, e) => a + e.intensity, 0) / Math.max(1, exs.length);
   const discs = [...new Set(exs.map((e) => e.discipline))];
   return {
