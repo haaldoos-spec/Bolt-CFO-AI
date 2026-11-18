@@ -7,8 +7,13 @@
 export const appleMapsPlaceUrl = (name: string, lat: number, lng: number) =>
   `https://maps.apple.com/?q=${encodeURIComponent(name)}&sll=${lat},${lng}&z=15`;
 
-export const appleMapsDirectionsUrl = (name: string, lat: number, lng: number) =>
-  `https://maps.apple.com/?daddr=${encodeURIComponent(name)}&sll=${lat},${lng}`;
+/** Vägbeskrivning i Apple Kartor. mode: d = bil, w = gång */
+export const appleMapsDirectionsUrl = (name: string, lat: number, lng: number, mode: 'd' | 'w' = 'd') =>
+  `https://maps.apple.com/?daddr=${encodeURIComponent(name)}&sll=${lat},${lng}&dirflg=${mode}`;
+
+/** Vägbeskrivning till exakta koordinater (egna sparade platser) */
+export const appleMapsDirectionsToCoords = (lat: number, lng: number, mode: 'd' | 'w' = 'd') =>
+  `https://maps.apple.com/?daddr=${lat},${lng}&dirflg=${mode}`;
 
 export const googleMapsPlaceUrl = (name: string, town = 'Huskvarna') =>
   `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(name.includes(town) ? name : `${name}, ${town}`)}`;

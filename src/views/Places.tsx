@@ -4,13 +4,19 @@ import type { CheckIn, DogId, Place, PlaceCategory } from '../types';
 import { useApp } from '../store/AppContext';
 import { DEFAULT_CENTER, HOME_LABEL, PLACES, PLACE_CATS, distanceKm } from '../data/places';
 import { dogsOf } from '../data/profiles';
-import { appleMapsDirectionsUrl, appleMapsPlaceUrl, googleMapsPlaceUrl, parseMapsLink, type ParsedMapsLink } from '../lib/maps';
+import { appleMapsDirectionsToCoords, appleMapsDirectionsUrl, appleMapsPlaceUrl, googleMapsPlaceUrl, parseMapsLink, type ParsedMapsLink } from '../lib/maps';
 import { Avatar, ICONS, SectionTitle, Sheet } from '../components/ui';
 
 const CAT_EMOJI: Record<PlaceCategory, string> = { skog: '🌲', balans: '🪨', cafe: '☕', vatten: '🌊' };
 
-/** Länken som öppnas när man trycker på en plats */
+/** Visa platsen i Apple Kartor */
 const mapsLinkFor = (p: Place) => p.mapsUrl ?? appleMapsPlaceUrl(p.name, p.lat, p.lng);
+
+/** Vägbeskrivning dit – det som öppnas när man trycker på en plats */
+const directionsFor = (p: Place, mode: 'd' | 'w' = 'd') => {
+  if (p.custom) return p.noCoords ? (p.mapsUrl ?? mapsLinkFor(p)) : appleMapsDirectionsToCoords(p.lat, p.lng, mode);
+  return appleMapsDirectionsUrl(p.name, p.lat, p.lng, mode);
+};
 
 const distText = (p: Place) => {
   if (p.noCoords) return null;
@@ -53,12 +59,12 @@ function PhotoThumb({ c, className = '' }: { c: CheckIn; className?: string }) {
   );
 }
 
-/** En rad i listan: hela raden öppnar platsen i Apple Kartor */
+/** En rad i listan: hela raden öppnar vägbeskrivning i Apple Kartor */
 function PlaceRow({ p, onMore }: { p: Place; onMore: () => void }) {
   const dist = distText(p);
   return (
     <div className="glass flex items-stretch overflow-hidden">
-      <a href={mapsLinkFor(p)} target="_blank" rel="noreferrer" className="flex min-w-0 flex-1 items-center gap-3 p-3.5 transition active:bg-white/5">
+      <a href={directionsFor(p)} target="_blank" rel="noreferrer" className="flex min-w-0 flex-1 items-center gap-3 p-3.5 transition active:bg-white/5">
         <div className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl text-xl" style={{ background: p.custom ? 'rgba(252,211,77,.18)' : `${PLACE_CATS[p.category].color}33` }}>
           {p.custom ? '⭐' : CAT_EMOJI[p.category]}
         </div>
@@ -70,7 +76,7 @@ function PlaceRow({ p, onMore }: { p: Place; onMore: () => void }) {
           </div>
         </div>
         <span className="chip shrink-0">
-          <Navigation size={11} /> {dist ?? 'Kartor'}
+          <Navigation size={11} /> {dist ?? 'Hitta dit'}
         </span>
       </a>
       <button onClick={onMore} className="grid w-12 shrink-0 place-items-center border-l border-white/10 text-white/60 active:bg-white/5" aria-label={`Mer om ${p.name}`}>
@@ -375,7 +381,7 @@ export function Places() {
       <div className="space-y-2">
         {mine.map((p) => <PlaceRow key={p.id} p={p} onMore={() => setPlaceOpen(p)} />)}
         {!mine.length && !filters.length && (
-          <p className="px-1 text-sm text-white/50">Inga egna platser än. Spara din första nedan – den öppnas i Apple Kartor när du trycker på den.</p>
+          <p className="px-1 text-sm text-white/50">Inga egna platser än. Spara din första nedan – trycker du på den får du vägbeskrivning dit i Apple Kartor.</p>
         )}
       </div>
       <div ref={addRef} className="mt-3">
@@ -388,7 +394,7 @@ export function Places() {
           <div className="space-y-2">
             {tips.map((p) => <PlaceRow key={p.id} p={p} onMore={() => setPlaceOpen(p)} />)}
           </div>
-          <p className="mt-2 px-1 text-[11px] text-white/40">Tryck på en plats för att öppna den i Apple Kartor. Avstånd räknas från {HOME_LABEL} centrum.</p>
+          <p className="mt-2 px-1 text-[11px] text-white/40">Tryck på en plats för vägbeskrivning i Apple Kartor. Avstånd räknas från {HOME_LABEL} centrum.</p>
         </>
       )}
 
@@ -458,14 +464,17 @@ export function Places() {
               </>
             )}
             <div className="space-y-2">
-              <a href={mapsLinkFor(placeOpen)} target="_blank" rel="noreferrer" className="btn-accent w-full">
-                <MapIcon size={18} /> Öppna i Apple Kartor
+              <a href={directionsFor(placeOpen, 'd')} target="_blank" rel="noreferrer" className="btn-accent w-full">
+                <Navigation size={18} /> Vägbeskrivning med bil
               </a>
-              {!placeOpen.mapsUrl && (
-                <a href={appleMapsDirectionsUrl(placeOpen.name, placeOpen.lat, placeOpen.lng)} target="_blank" rel="noreferrer" className="btn-ghost w-full">
-                  <Navigation size={16} /> Vägbeskrivning
+              {!placeOpen.noCoords && (
+                <a href={directionsFor(placeOpen, 'w')} target="_blank" rel="noreferrer" className="btn-ghost w-full">
+                  <Navigation size={16} /> Vägbeskrivning till fots
                 </a>
               )}
+              <a href={mapsLinkFor(placeOpen)} target="_blank" rel="noreferrer" className="btn-ghost w-full">
+                <MapIcon size={16} /> Visa platsen i Apple Kartor
+              </a>
               <a href={placeOpen.mapsUrl?.includes('google') ? placeOpen.mapsUrl : googleMapsPlaceUrl(placeOpen.name, HOME_LABEL)} target="_blank" rel="noreferrer" className="btn-ghost w-full">
                 <MapIcon size={16} /> Google Maps
               </a>
@@ -516,7 +525,7 @@ export function Places() {
               {(() => {
                 const p = [...state.myPlaces, ...PLACES].find((x) => x.id === memory.placeId);
                 return p ? (
-                  <a href={mapsLinkFor(p)} target="_blank" rel="noreferrer" className="btn-ghost"><MapIcon size={16} /> Kartor</a>
+                  <a href={directionsFor(p)} target="_blank" rel="noreferrer" className="btn-ghost"><Navigation size={16} /> Hitta dit</a>
                 ) : (
                   <span className="btn-ghost opacity-40"><MapIcon size={16} /> Ingen plats</span>
                 );
