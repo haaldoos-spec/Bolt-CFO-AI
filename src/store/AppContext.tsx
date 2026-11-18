@@ -57,6 +57,9 @@ const load = (): AppState => {
       (Object.keys(s.dogs) as DogId[]).forEach((d) => {
         if (!s.dogs[d].customAvatar) s.dogs[d].avatar = DEFAULT_DOGS[d].avatar;
       });
+      // Demominnen följer med när demoplatserna byts (t.ex. till Jönköping/Huskvarna)
+      const seedCheckins = seedState().checkins;
+      s.checkins = s.checkins.map((c) => { const seed = seedCheckins.find((x) => x.id === c.id); return seed ? { ...seed, date: c.date } : c; });
       return s;
     }
   } catch {

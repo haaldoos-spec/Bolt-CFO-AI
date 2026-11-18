@@ -24,11 +24,11 @@ export const seedState = (): AppState => ({
     { id: 's6', date: daysAgo(6, 9), dogs: ['senior', 'puppy'], discipline: 'tricks', minutes: 15, intensity: 1, ratings: { senior: 5, puppy: 4 }, title: 'Trickkväll' },
   ],
   checkins: [
-    { id: 'c1', placeId: 'p-hellas', placeName: 'Hellasgården', lat: 59.2896, lng: 18.1593, date: daysAgo(2, 12), dogs: ['senior', 'puppy'], note: 'Valpens första plask! Senioren visade hur man gör 🥹', questTitle: 'Första plasket' },
-    { id: 'c2', placeId: 'p-sodermalm', placeName: 'Café på Södermalm', lat: 59.3155, lng: 18.0710, date: daysAgo(5, 14), dogs: ['puppy'], note: '3 min stanna-kvar under bordet. Fick beröm av servitrisen.' },
-    { id: 'c3', placeId: 'p-nacka', placeName: 'Nackareservatet – Velamsund', lat: 59.2965, lng: 18.1590, date: daysAgo(9, 9), dogs: ['senior'], note: 'Morgonspår i dimman. Magiskt.' },
-    { id: 'c4', placeId: 'p-gardet', placeName: 'Gärdet', lat: 59.3460, lng: 18.0980, date: daysAgo(21, 11), dogs: ['senior', 'puppy'], note: 'Långlina och inkallning med visselpipan.' },
-    { id: 'c5', placeId: 'p-djurg', placeName: 'Djurgården – Lill-Jansskogen', lat: 59.3570, lng: 18.0700, date: daysAgo(48, 13), dogs: ['puppy'], note: 'Första dagen hemma-veckan: stubbe-klättring!' },
+    { id: 'c1', placeId: 'p-vattern-husk', placeName: 'Vätterstranden Huskvarna', lat: 57.7958, lng: 14.2706, date: daysAgo(2, 12), dogs: ['senior', 'puppy'], note: 'Valpens första plask! Senioren visade hur man gör 🥹', questTitle: 'Första plasket' },
+    { id: 'c2', placeId: 'p-strandpromenaden', placeName: 'Strandpromenaden Jönköping', lat: 57.7873, lng: 14.1675, date: daysAgo(5, 14), dogs: ['puppy'], note: '3 min stanna-kvar under bordet. Fick beröm av servitrisen.' },
+    { id: 'c3', placeId: 'p-bymarken', placeName: 'Bymarken', lat: 57.7748, lng: 14.1186, date: daysAgo(9, 9), dogs: ['senior'], note: 'Morgonspår i dimman. Magiskt.' },
+    { id: 'c4', placeId: 'p-stromsberg', placeName: 'Strömsbergs friluftsområde', lat: 57.7694, lng: 14.2004, date: daysAgo(21, 11), dogs: ['senior', 'puppy'], note: 'Långlina och inkallning med visselpipan.' },
+    { id: 'c5', placeId: 'p-stadsparken', placeName: 'Stadsparken Jönköping', lat: 57.7857, lng: 14.1486, date: daysAgo(48, 13), dogs: ['puppy'], note: 'Första veckan hemma: stubbe-klättring!' },
   ],
   questsDone: [
     { id: 'qd1', questId: 'q-plask', date: daysAgo(2, 12), profile: 'puppy' },

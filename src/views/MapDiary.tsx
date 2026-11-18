@@ -1,11 +1,11 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { MapContainer, Marker, TileLayer, Tooltip, useMap } from 'react-leaflet';
+import { MapContainer, Marker, TileLayer, Tooltip, useMap, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { Camera, Check, ImagePlus, LocateFixed, MapPin, Navigation, Plus, Trash2 } from 'lucide-react';
 import type { CheckIn, DogId, Place, PlaceCategory } from '../types';
 import { useApp } from '../store/AppContext';
-import { DEFAULT_CENTER, PLACES, PLACE_CATS, distanceKm } from '../data/places';
+import { DEFAULT_CENTER, HOME_LABEL, PLACES, PLACE_CATS, distanceKm } from '../data/places';
 import { dogsOf } from '../data/profiles';
 import { Avatar, ICONS, SectionTitle, Sheet } from '../components/ui';
 
@@ -29,6 +29,17 @@ const photoIcon = (c: CheckIn) =>
     iconSize: [52, 52],
     iconAnchor: [26, 26],
   });
+
+/** Döljer platsnamnen när man zoomat ut, så de inte krockar */
+function LabelToggle() {
+  const map = useMapEvents({
+    zoomend: () => map.getContainer().classList.toggle('labels-hidden', map.getZoom() < 12.5),
+  });
+  useEffect(() => {
+    map.getContainer().classList.toggle('labels-hidden', map.getZoom() < 12.5);
+  }, [map]);
+  return null;
+}
 
 const meIcon = L.divIcon({ className: '', html: '<div class="me-pin"></div>', iconSize: [18, 18], iconAnchor: [9, 9] });
 
@@ -207,7 +218,9 @@ export function MapDiary() {
 
   const locate = () => {
     if (!navigator.geolocation) {
-      toast('Platstjänster saknas – visar Stockholm');
+      toast(`Platstjänster saknas – visar ${HOME_LABEL}`);
+      setUserPos(DEFAULT_CENTER);
+      flyTo(DEFAULT_CENTER, 11);
       return;
     }
     setLocating(true);
@@ -222,7 +235,7 @@ export function MapDiary() {
         setLocating(false);
         setUserPos(DEFAULT_CENTER);
         flyTo(DEFAULT_CENTER, 11);
-        toast('Kunde inte hämta position – visar Stockholm');
+        toast(`Visar äventyr runt ${HOME_LABEL}`);
       },
       { enableHighAccuracy: true, timeout: 8000 },
     );
@@ -256,7 +269,7 @@ export function MapDiary() {
       </div>
 
       <div ref={mapRef} className="glass relative h-[52vh] min-h-[340px] overflow-hidden !rounded-[28px] p-0">
-        <MapContainer center={DEFAULT_CENTER} zoom={11} className={`h-full w-full ${OFFLINE_MAP ? 'map-offline' : ''}`} attributionControl={!OFFLINE_MAP}>
+        <MapContainer center={DEFAULT_CENTER} zoom={11} zoomSnap={0.5} className={`h-full w-full ${OFFLINE_MAP ? 'map-offline' : ''}`} attributionControl={!OFFLINE_MAP}>
           {!OFFLINE_MAP && (
             <TileLayer
               url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
@@ -264,6 +277,7 @@ export function MapDiary() {
             />
           )}
           <FlyTo target={fly} />
+          <LabelToggle />
           {places.map((p) => (
             <Marker key={p.id} position={[p.lat, p.lng]} icon={placeIcon(p)} eventHandlers={{ click: () => setPlaceOpen(p) }}>
               {OFFLINE_MAP && (

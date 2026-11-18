@@ -98,3 +98,4 @@ html.artifact .app-header { padding-top: 14px; }
 }
 .place-label { background: rgba(10,12,20,.72) !important; border: 1px solid rgba(255,255,255,.18) !important; color: #fff !important; border-radius: 9999px !important; padding: 2px 8px !important; font-size: 10.5px !important; font-weight: 700; box-shadow: none !important; }
 .place-label::before { display: none; }
+.labels-hidden .place-label { display: none; }
