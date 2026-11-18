@@ -1,6 +1,6 @@
 import type { AppState, DisciplineId, DogId, ProfileId } from '../types';
 import { DISCIPLINES, EXERCISES } from '../data/training';
-import { ageText, dogsOf } from '../data/profiles';
+import { ageText, daysUntilHome, dogsOf, homeDateText } from '../data/profiles';
 import { streakFor } from './xp';
 
 export interface Insight {
@@ -37,6 +37,18 @@ export function generateInsights(state: AppState, profile: ProfileId): Insight[]
 
   for (const dog of dogs) {
     const info = state.dogs[dog];
+    if (dog === 'puppy') {
+      const left = daysUntilHome(info.birth);
+      if (left > 0) {
+        out.push({
+          id: 'puppy-coming',
+          tone: 'fun',
+          title: `${left} dagar kvar tills ${info.name} kommer hem`,
+          body: `${info.name} är ${ageText(info.birth)} och flyttar hem den ${homeDateText(info.birth)}. Passa på att förbereda: valpsäkra hemmet, handla det viktigaste och ge ${state.dogs.senior.name} en egen fristad. Allt finns i valpguiden under ”Före hemkomst”.`,
+        });
+        continue;
+      }
+    }
     const l = last(dog);
     const isPuppy = dog === 'puppy';
     if (l && hoursSince(l.date) < 36 && l.intensity >= 3) {

@@ -79,8 +79,8 @@ const load = (): AppState => {
         s.dogs[d].ageLabel = DEFAULT_DOGS[d].ageLabel;
         s.dogs[d].weightKg = DEFAULT_DOGS[d].weightKg;
       });
-      // Demodata v2: valpen är 8 veckor och har precis kommit hem
-      if ((s.seedVersion ?? 1) < 2) {
+      // Demodata v3: Kyle är 4 veckor och flyttar hem den 14 december
+      if ((s.seedVersion ?? 1) < 3) {
         const seed = seedState();
         const seedIds = new Set(['s1', 's2', 's3', 's4', 's5', 's6', 'c1', 'c2', 'c3', 'c4', 'c5', 'qd1', 'qd2']);
         s.sessions = [...seed.sessions, ...s.sessions.filter((x) => !seedIds.has(x.id))];
@@ -88,7 +88,7 @@ const load = (): AppState => {
         s.questsDone = s.questsDone.filter((x) => !seedIds.has(x.id));
         s.completed.puppy = [];
         s.xp.puppy = (s.puppyGuide?.length ?? 0) * 10;
-        s.seedVersion = 2;
+        s.seedVersion = 3;
       }
       s.myPlaces ??= [];
       s.puppyGuide ??= [];

@@ -70,10 +70,10 @@ export const DEFAULT_DOGS: Record<DogId, DogInfo> = {
     id: 'puppy',
     name: 'Kyle',
     breedLabel: 'Gul labrador',
-    ageLabel: '8 veckor',
-    birth: '2026-09-23',
+    ageLabel: '8 veckor den 14 december 2026',
+    birth: '2026-10-19',
     avatar: puppyAvatar,
-    weightKg: 6,
+    weightKg: 3,
   },
 };
 
@@ -84,6 +84,19 @@ export const ageText = (birth: string, at: Date = new Date()) => {
   const months = Math.floor(days / 30.44);
   if (months < 24) return `${months} mån`;
   return `${Math.floor(days / 365.25)} år`;
+};
+
+/** Valpen flyttar hem vid 8 veckors ålder. Returnerar antal dagar kvar (0 = hemma). */
+export const daysUntilHome = (birth: string, at: Date = new Date()) => {
+  const home = new Date(birth);
+  home.setDate(home.getDate() + 56);
+  return Math.max(0, Math.ceil((+home - +at) / 864e5));
+};
+
+export const homeDateText = (birth: string) => {
+  const home = new Date(birth);
+  home.setDate(home.getDate() + 56);
+  return home.toLocaleDateString('sv-SE', { day: 'numeric', month: 'long' });
 };
 
 export const OLD_DEFAULT_NAMES: Record<DogId, string> = { senior: 'Svart Senior', puppy: 'Gul Valp' };

@@ -1,7 +1,7 @@
 import { Heart, Trophy } from 'lucide-react';
 import type { DogId } from '../types';
 import { useApp } from '../store/AppContext';
-import { PROFILE_META, ageText } from '../data/profiles';
+import { PROFILE_META, ageText, daysUntilHome, homeDateText } from '../data/profiles';
 import { levelInfo, levelTitle } from '../lib/xp';
 import { Avatar } from './ui';
 
@@ -72,6 +72,11 @@ export function ProfileHero() {
       <div className="mt-3 inline-flex animate-rise items-center gap-1.5 rounded-full px-3 py-1 text-xs font-extrabold text-ink [animation-delay:80ms]" style={{ background: 'linear-gradient(120deg,var(--a1),var(--a2))' }}>
         <Trophy size={13} /> Nivå {lv.level} · {levelTitle(lv.level)}
       </div>
+      {profile === 'puppy' && daysUntilHome(info.birth) > 0 && (
+        <div className="mt-2 text-sm font-semibold text-[var(--a1)]">
+          🏡 Kommer hem {homeDateText(info.birth)} – om {daysUntilHome(info.birth)} dagar
+        </div>
+      )}
       <FocusChips items={meta.focus} />
     </div>
   );
