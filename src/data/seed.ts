@@ -30,6 +30,7 @@ export const seedState = (): AppState => ({
     { id: 'c4', placeId: 'p-stromsberg', placeName: 'Strömsbergs friluftsområde', lat: 57.7694, lng: 14.2004, date: daysAgo(21, 11), dogs: ['senior', 'puppy'], note: 'Långlina och inkallning med visselpipan.' },
     { id: 'c5', placeId: 'p-folketspark', placeName: 'Folkets park Huskvarna', lat: 57.7909, lng: 14.2858, date: daysAgo(48, 13), dogs: ['puppy'], note: 'Första veckan hemma: stubbe-klättring!' },
   ],
+  myPlaces: [],
   questsDone: [
     { id: 'qd1', questId: 'q-plask', date: daysAgo(2, 12), profile: 'puppy' },
     { id: 'qd2', questId: 'q-cafe', date: daysAgo(5, 14), profile: 'puppy' },

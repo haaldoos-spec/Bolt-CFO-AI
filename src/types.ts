@@ -66,6 +66,9 @@ export interface Place {
   goodFor: string[];
   seniorFriendly: boolean;
   puppyFriendly: boolean;
+  /** Egen markerad favoritplats */
+  custom?: boolean;
+  createdAt?: string;
 }
 
 export interface CheckIn {
@@ -111,5 +114,6 @@ export interface AppState {
   completed: Record<DogId, string[]>; // exercise-id:n
   sessions: SessionRecord[];
   checkins: CheckIn[];
+  myPlaces: Place[];
   questsDone: { id: string; questId: string; date: string; profile: ProfileId }[];
 }

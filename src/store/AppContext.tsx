@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useMemo, useReducer, useState, type ReactNode } from 'react';
-import type { AppState, CheckIn, DisciplineId, DogId, DogInfo, ProfileId, SessionRecord, TabId } from '../types';
+import type { AppState, CheckIn, Place, DisciplineId, DogId, DogInfo, ProfileId, SessionRecord, TabId } from '../types';
 
 export type GeneratorPreset = { discipline?: DisciplineId | 'mix'; minutes?: number };
 import { seedState } from '../data/seed';
@@ -11,6 +11,8 @@ type Action =
   | { type: 'addSession'; session: SessionRecord }
   | { type: 'addCheckin'; checkin: CheckIn }
   | { type: 'deleteCheckin'; id: string }
+  | { type: 'addPlace'; place: Place }
+  | { type: 'deletePlace'; id: string }
   | { type: 'questDone'; questId: string; profile: ProfileId }
   | { type: 'updateDog'; dog: DogId; patch: Partial<DogInfo> }
   | { type: 'reset' };
@@ -39,6 +41,10 @@ function reducer(s: AppState, a: Action): AppState {
       return { ...s, checkins: [a.checkin, ...s.checkins] };
     case 'deleteCheckin':
       return { ...s, checkins: s.checkins.filter((c) => c.id !== a.id) };
+    case 'addPlace':
+      return { ...s, myPlaces: [a.place, ...s.myPlaces] };
+    case 'deletePlace':
+      return { ...s, myPlaces: s.myPlaces.filter((p) => p.id !== a.id) };
     case 'questDone':
       return { ...s, questsDone: [{ id: crypto.randomUUID(), questId: a.questId, profile: a.profile, date: new Date().toISOString() }, ...s.questsDone] };
     case 'updateDog':
@@ -57,6 +63,7 @@ const load = (): AppState => {
       (Object.keys(s.dogs) as DogId[]).forEach((d) => {
         if (!s.dogs[d].customAvatar) s.dogs[d].avatar = DEFAULT_DOGS[d].avatar;
       });
+      s.myPlaces ??= [];
       // Demominnen följer med när demoplatserna byts (t.ex. till Jönköping/Huskvarna)
       const seedCheckins = seedState().checkins;
       s.checkins = s.checkins.map((c) => { const seed = seedCheckins.find((x) => x.id === c.id); return seed ? { ...seed, date: c.date } : c; });
