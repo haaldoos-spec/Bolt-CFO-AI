@@ -1,6 +1,6 @@
 export type DogId = 'senior' | 'puppy';
 export type ProfileId = DogId | 'both';
-export type TabId = 'home' | 'map' | 'training' | 'profile';
+export type TabId = 'home' | 'map' | 'training' | 'profile' | 'mamma';
 
 export type DisciplineId = 'valp' | 'stod' | 'vardag' | 'rally' | 'spar' | 'sok' | 'agility' | 'tricks' | 'freestyle' | 'bruks';
 export type ExerciseLevel = 'byggsten' | 'kedja' | 'program';
