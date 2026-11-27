@@ -1,5 +1,5 @@
 // Enkel offline-cache för app-skalet (network-first för HTML, cache-first för assets)
-const CACHE = 'labbeliv-v1';
+const CACHE = 'labbeliv-v2';
 self.addEventListener('install', (e) => {
   e.waitUntil(caches.open(CACHE).then((c) => c.addAll(['/', '/manifest.webmanifest', '/icons/icon.svg'])));
   self.skipWaiting();
@@ -12,6 +12,7 @@ self.addEventListener('fetch', (e) => {
   const req = e.request;
   if (req.method !== 'GET') return;
   const url = new URL(req.url);
+  if (url.pathname.startsWith('/api/')) return; // aldrig cacha inloggning
   if (req.mode === 'navigate') {
     e.respondWith(fetch(req).catch(() => caches.match('/')));
     return;

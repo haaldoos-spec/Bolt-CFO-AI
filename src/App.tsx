@@ -9,8 +9,30 @@ import { Home } from './views/Home';
 import { Places } from './views/Places';
 import { Training } from './views/Training';
 import { Profile } from './views/Profile';
+import { Mamma } from './views/Mamma';
+import { Login } from './views/Login';
+import { useAuth } from './lib/auth';
 
 export default function App() {
+  const { status } = useAuth();
+  if (status.state === 'loading') return <Background />;
+  if (status.state === 'anon') return (<><Background /><Login /></>);
+  return status.role === 'mamma' ? <MammaApp /> : <OwnerApp />;
+}
+
+// Mammas avskalade app: bara Mamma-vyn, inga andra flikar eller overlays.
+function MammaApp() {
+  return (
+    <>
+      <Background />
+      <div className="mx-auto min-h-[100dvh] max-w-lg px-4 pb-10 pt-[calc(env(safe-area-inset-top)+24px)]">
+        <Mamma />
+      </div>
+    </>
+  );
+}
+
+function OwnerApp() {
   const { tab } = useApp();
   return (
     <>
@@ -22,6 +44,7 @@ export default function App() {
           {tab === 'map' && <Places />}
           {tab === 'training' && <Training />}
           {tab === 'profile' && <Profile />}
+          {tab === 'mamma' && <Mamma />}
         </main>
       </div>
       <BottomNav />

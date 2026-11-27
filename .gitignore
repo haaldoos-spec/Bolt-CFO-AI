@@ -5,3 +5,5 @@ dist
 dist-artifact
 scripts/osm/raw.json
 *.osm.pbf
+.env
+.vercel
