@@ -6,6 +6,7 @@ import { DISCIPLINES, EQUIPMENT, EXERCISES, LEVEL_LABEL, allExercises, disciplin
 import { dogsOf } from '../data/profiles';
 import { disciplineProgress } from '../lib/coach';
 import { PuppyGuideCard } from '../components/PuppyGuide';
+import { CalmButton } from '../components/CalmButton';
 import { MyPasses, useAddToPass } from '../components/PassBuilder';
 import { Avatar, EQUIP_ICONS, ICONS, Progress, SectionTitle, Sheet } from '../components/ui';
 
@@ -319,6 +320,7 @@ export function Training() {
         <DisciplineDetail id={disc} onBack={() => setDisc(null)} onOpen={setOpen} />
       ) : (
         <div className="animate-rise">
+          {profile !== 'senior' && <div className="mb-3"><CalmButton /></div>}
           {profile === 'puppy' && <div className="mb-3"><PuppyGuideCard /></div>}
           <button onClick={() => openGenerator({})} className="glass relative flex w-full items-center gap-4 overflow-hidden p-5 text-left transition active:scale-[.98]">
             <div className="pointer-events-none absolute inset-0 animate-shimmer opacity-20" style={{ backgroundImage: 'linear-gradient(110deg,transparent 30%,var(--a1) 50%,transparent 70%)', backgroundSize: '200% 100%' }} />

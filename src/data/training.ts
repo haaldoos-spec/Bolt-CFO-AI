@@ -2,6 +2,7 @@ import type { Discipline, DisciplineId, Equipment, EquipmentId, Exercise } from 
 import { BASE_PROGRAM_MOMENTS, MORE_EXERCISES } from './trainingMore';
 import { SPORT_EXERCISES } from './trainingSports';
 import { PUPPY_EXERCISES } from './trainingPuppy';
+import { SUPPORT_EXERCISES } from './trainingSupport';
 
 export const EQUIPMENT: Record<EquipmentId, Equipment> = {
   klicker: { id: 'klicker', name: 'Klicker' },
@@ -39,6 +40,20 @@ export const DISCIPLINES: Discipline[] = [
         'Inga hopp, trappor eller långa promenader under tillväxten – ca 5 minuters promenad per månad i ålder, två gånger om dagen.',
         'Socialiseringsfönstret stänger kring 12–16 veckor: nya ljud, människor och underlag i lagom dos.',
         'Valpkurs hos t.ex. en brukshundklubb eller studieförbund passar från ca 10–12 veckor, när valpen är vaccinerad.',
+      ],
+    },
+  },
+  {
+    id: 'stod', name: 'Stödhund', tagline: 'Närhet, fokus och trygghet – ni tränar själva', goalLabel: 'Ångestkedjan sitter', icon: 'HeartHandshake',
+    rules: {
+      org: 'Ingen certifiering', period: 'Egenträning – inte en officiell assistanshund', official: false,
+      facts: [
+        'Det här är egenträning. Kyle blir ett stöd i vardagen, men ingen certifierad assistanshund. Det ersätter inte vård eller behandling.',
+        'Utan certifiering har ni ingen laglig rätt att ta med hund i butiker, på buss eller i andra miljöer där hundar annars inte är välkomna. Fråga alltid först.',
+        'Varje moment har en rekommenderad startålder. Tryck med full kroppsvikt väntar tills Kyle är färdigväxt (ca 12–18 mån).',
+        'Träna när du mår bra, så att momenten sitter den dag du behöver dem. Korta pass på 3–5 minuter.',
+        'Mår du dåligt? Avbryt träningen. Hunden ska aldrig vara ansvarig för ditt mående.',
+        'Akut: ring 112. Sjukvårdsrådgivning: 1177. Självmordslinjen: 90101.',
       ],
     },
   },
@@ -619,6 +634,7 @@ export const EXERCISES: Exercise[] = [
   ...MORE_EXERCISES,
   ...SPORT_EXERCISES,
   ...PUPPY_EXERCISES,
+  ...SUPPORT_EXERCISES,
 ];
 
 /** Egna övningar (från användarens data) – sätts av AppProvider */

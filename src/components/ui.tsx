@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import {
-  Bone, Cable, Coffee, Cookie, Disc, Disc3, Dumbbell, Fence, Flag, Footprints, House, LifeBuoy, Link, Megaphone,
+  Bone, Cable, Coffee, Cookie, Disc, Disc3, Dumbbell, Fence, Flag, Footprints, HeartHandshake, House, LifeBuoy, Link, Megaphone,
   Mountain, MousePointerClick, Package, PawPrint, RectangleHorizontal, Search, Shirt, Signpost, Spline, Sparkles, Square,
   Star, Target, TrafficCone, Music, Medal, Trees, Waves, X, Zap, BedDouble, type LucideIcon,
 } from 'lucide-react';
@@ -9,7 +9,7 @@ import type { DogId, EquipmentId } from '../types';
 import { useApp } from '../store/AppContext';
 
 export const ICONS: Record<string, LucideIcon> = {
-  Home: House, Signpost, Footprints, Search, Zap, Sparkles, Trees, Mountain, Coffee, Waves, Music, Medal, PawPrint,
+  Home: House, Signpost, Footprints, Search, Zap, Sparkles, Trees, Mountain, Coffee, Waves, Music, Medal, PawPrint, HeartHandshake,
 };
 
 export const EQUIP_ICONS: Record<EquipmentId, LucideIcon> = {

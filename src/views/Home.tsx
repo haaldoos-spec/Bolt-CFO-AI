@@ -9,6 +9,7 @@ import { isToday, levelInfo } from '../lib/xp';
 import { Avatar, Progress, SectionTitle } from '../components/ui';
 import { DISCIPLINES } from '../data/training';
 import { PuppyGuideCard } from '../components/PuppyGuide';
+import { CalmButton } from '../components/CalmButton';
 import { TodayPanel } from '../components/TodayPanel';
 
 function useTypewriter(text: string, speed = 14) {
@@ -215,6 +216,7 @@ export function Home() {
     <div className="space-y-4">
       <div className="animate-rise"><CoachCard /></div>
       <div className="animate-rise [animation-delay:40ms]"><TodayPanel /></div>
+      {profile !== 'senior' && <div className="animate-rise [animation-delay:30ms]"><CalmButton /></div>}
       {profile === 'puppy' && <div className="animate-rise [animation-delay:60ms]"><PuppyGuideCard /></div>}
       <div className="animate-rise [animation-delay:80ms]"><QuestCard /></div>
 
@@ -285,7 +287,7 @@ export function Home() {
 
       <SectionTitle kicker="Fokus" title="Rekommenderade grenar" right={<button onClick={() => setTab('training')} className="text-xs font-semibold text-white/60">Alla <ChevronRight size={14} className="inline" /></button>} />
       <div className="-mx-4 flex gap-3 overflow-x-auto px-4 pb-1 no-scrollbar">
-        {DISCIPLINES.filter((d) => (profile === 'senior' ? ['sok', 'spar', 'tricks', 'vardag'] : profile === 'puppy' ? ['valp', 'vardag', 'agility', 'tricks'] : ['vardag', 'sok', 'tricks', 'rally']).includes(d.id)).map((d) => (
+        {DISCIPLINES.filter((d) => (profile === 'senior' ? ['sok', 'spar', 'tricks', 'vardag'] : profile === 'puppy' ? ['valp', 'stod', 'vardag', 'tricks'] : ['vardag', 'sok', 'tricks', 'rally']).includes(d.id)).map((d) => (
           <button key={d.id} onClick={() => openGenerator({ discipline: d.id, minutes: 15 })} className="glass w-40 shrink-0 p-4 text-left transition active:scale-95">
             <Sparkles size={18} className="mb-6 text-[var(--a2)]" />
             <div className="text-sm font-bold">{d.name}</div>
