@@ -1,4 +1,4 @@
-import { json, roleFromRequest } from './_session';
+import { json, roleFromRequest } from './_session.js';
 
 export async function GET(request: Request) {
   const role = roleFromRequest(request);

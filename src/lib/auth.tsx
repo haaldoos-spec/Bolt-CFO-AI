@@ -65,6 +65,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify({ password }),
       });
+      if (res.status === 503) return 'Servern är inte färdigkonfigurerad. Kontrollera lösenorden i Vercel och gör en ny deploy.';
       if (!res.ok) return res.status === 401 ? 'Fel lösenord – försök igen.' : 'Något gick fel. Försök igen.';
       const { role } = (await res.json()) as { role: Role };
       remember(role);
