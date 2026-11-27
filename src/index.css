@@ -25,18 +25,44 @@ body {
 }
 
 @layer components {
+  /* Glas med ljusbrytande hårfin kant (gradient) och mjuk inre glans */
   .glass {
-    @apply rounded-3xl border border-white/[0.12] bg-white/[0.06] shadow-[0_8px_32px_-8px_rgba(0,0,0,.45)] backdrop-blur-xl;
-    background-image: linear-gradient(145deg, rgba(255,255,255,.09), rgba(255,255,255,.02));
+    @apply rounded-3xl border border-transparent bg-white/[0.055] backdrop-blur-xl;
+    position: relative;
+    background-image:
+      radial-gradient(120% 80% at 0% 0%, rgba(255,255,255,.10), transparent 55%),
+      linear-gradient(160deg, rgba(255,255,255,.07), rgba(255,255,255,.015));
+    box-shadow:
+      0 1px 0 rgba(255,255,255,.06) inset,
+      0 24px 48px -24px rgba(0,0,0,.65),
+      0 2px 6px -2px rgba(0,0,0,.35);
   }
   .glass-strong {
-    @apply rounded-3xl border border-white/20 bg-white/[0.1] shadow-[0_20px_60px_-15px_rgba(0,0,0,.6)] backdrop-blur-2xl;
+    @apply rounded-3xl border border-transparent bg-white/[0.09] backdrop-blur-2xl;
+    position: relative;
+    box-shadow: 0 1px 0 rgba(255,255,255,.1) inset, 0 30px 70px -20px rgba(0,0,0,.7);
+  }
+  .glass::before, .glass-strong::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(155deg, rgba(255,255,255,.34), rgba(255,255,255,.06) 35%, rgba(255,255,255,.02) 60%, color-mix(in srgb, var(--a1) 35%, transparent));
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
   }
   .btn-accent {
-    @apply inline-flex items-center justify-center gap-2 rounded-2xl px-5 py-3.5 font-semibold text-ink transition active:scale-[.97];
-    background: linear-gradient(120deg, var(--a1), var(--a2));
-    box-shadow: 0 10px 30px -10px var(--a1), inset 0 1px 0 rgba(255,255,255,.5);
+    @apply inline-flex items-center justify-center gap-2 rounded-2xl px-5 py-3.5 font-semibold text-ink transition duration-200 active:scale-[.97];
+    background:
+      linear-gradient(180deg, rgba(255,255,255,.28), rgba(255,255,255,0) 55%),
+      linear-gradient(120deg, var(--a1), var(--a2));
+    box-shadow: 0 12px 32px -12px var(--a1), 0 1px 0 rgba(255,255,255,.55) inset, 0 -1px 0 rgba(0,0,0,.12) inset;
+    letter-spacing: .005em;
   }
+  .btn-accent:hover { filter: brightness(1.06); }
   .btn-ghost {
     @apply inline-flex items-center justify-center gap-2 rounded-2xl border border-white/15 bg-white/[0.06] px-4 py-3 font-medium text-white/90 transition hover:bg-white/10 active:scale-[.97];
   }
@@ -53,8 +79,9 @@ body {
     box-shadow: 0 0 0 2px color-mix(in srgb, var(--a1) 70%, transparent), 0 0 28px 4px color-mix(in srgb, var(--a1) 45%, transparent);
   }
   .label {
-    @apply text-[11px] font-bold uppercase tracking-[.14em] text-white/45;
+    @apply text-[10.5px] font-bold uppercase tracking-[.18em] text-white/45;
   }
+  .num { font-variant-numeric: tabular-nums; letter-spacing: -.01em; }
   .no-scrollbar::-webkit-scrollbar { display: none; }
   .no-scrollbar { scrollbar-width: none; }
 }
@@ -63,3 +90,16 @@ input[type=range] { accent-color: var(--a1); }
 
 /* Inuti Claude-artefakten paddar värdsidan redan :root med safe-area */
 html.artifact .app-header { padding-top: 14px; }
+
+/* Mjuka sidbyten mellan flikarna */
+@keyframes page-in { 0% { opacity: 0; transform: translateY(10px) scale(.995); filter: blur(6px); } 100% { opacity: 1; transform: none; filter: blur(0); } }
+.page-in { animation: page-in .55s cubic-bezier(.2,.8,.2,1) both; }
+
+/* Långsamt roterande norrsken bakom allt */
+@keyframes aurora { to { transform: rotate(360deg); } }
+.aurora { animation: aurora 60s linear infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+}
+.no-edge::before { display: none; }

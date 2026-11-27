@@ -3,13 +3,14 @@ import { Camera, Clock, Flame, Image as ImageIcon, Pencil, RotateCcw, Star, Trop
 import type { DogId } from '../types';
 import { useApp } from '../store/AppContext';
 import { ageText, dogsOf } from '../data/profiles';
+import { heatmap } from '../lib/insights';
 import { BACKUP_KEY } from '../store/AppContext';
 import { mergeStates } from '../lib/sync';
 import type { AppState } from '../types';
 import { DISCIPLINES } from '../data/training';
 import { disciplineProgress } from '../lib/coach';
 import { levelInfo, levelTitle, streakFor } from '../lib/xp';
-import { Avatar, Progress, Ring, SectionTitle, Stars } from '../components/ui';
+import { Avatar, Progress, Ring, SectionTitle, Stars, CountUp } from '../components/ui';
 
 const readAvatar = (file: File): Promise<string> =>
   new Promise((resolve) => {
@@ -88,7 +89,7 @@ function DogCard({ dog }: { dog: DogId }) {
 
       <div className="relative mt-4">
         <div className="mb-1 flex justify-between text-[11px] font-semibold text-white/55">
-          <span>{state.xp[dog]} XP totalt</span>
+          <span><CountUp value={state.xp[dog]} /> XP totalt</span>
           <span>{lv.need - lv.into} XP till nivå {lv.level + 1}</span>
         </div>
         <Progress value={lv.pct} />
@@ -110,6 +111,64 @@ function DogCard({ dog }: { dog: DogId }) {
           <div className="font-display text-lg font-semibold">{avg ? avg.toFixed(1) : '–'}</div>
           <div className="text-[10px] font-semibold text-white/45">snittbetyg</div>
         </div>
+      </div>
+    </div>
+  );
+}
+
+/** Aktivitetskarta: varje ruta är en dag, ljusare = fler minuter */
+function Heatmap() {
+  const { state, profile } = useApp();
+  const h = heatmap(state, dogsOf(profile), 12);
+  const weeks = Array.from({ length: 12 }, (_, w) => h.days.slice(w * 7, w * 7 + 7));
+  const months = weeks.map((w, i) => {
+    const m = w[0].date.toLocaleDateString('sv-SE', { month: 'short' });
+    const prev = i > 0 ? weeks[i - 1][0].date.toLocaleDateString('sv-SE', { month: 'short' }) : '';
+    return m !== prev ? m : '';
+  });
+  return (
+    <div className="glass p-5">
+      <div className="mb-4 flex items-end justify-between">
+        <div>
+          <div className="num font-display text-3xl font-semibold"><CountUp value={h.active} /><span className="ml-1 font-sans text-sm font-semibold text-white/50">träningsdagar</span></div>
+          <div className="text-xs text-white/50">senaste 12 veckorna · {h.total} min totalt</div>
+        </div>
+      </div>
+      <div className="flex gap-1.5">
+        <div className="flex flex-col justify-between py-[1px] pr-1 text-[9px] font-semibold text-white/35">
+          {['M', '', 'O', '', 'F', '', 'S'].map((d, i) => <span key={i} className="h-[calc((100%-36px)/7)] leading-none">{d}</span>)}
+        </div>
+        <div className="grid flex-1 grid-cols-12 gap-[3px]">
+          {weeks.map((w, wi) => (
+            <div key={wi} className="flex flex-col gap-[3px]">
+              {w.map((d) => {
+                const k = d.minutes / h.max;
+                const isToday = d.date.toDateString() === new Date().toDateString();
+                return (
+                  <div
+                    key={d.date.toISOString()}
+                    title={`${d.date.toLocaleDateString('sv-SE', { weekday: 'short', day: 'numeric', month: 'short' })}: ${d.minutes} min`}
+                    className={`aspect-square rounded-[4px] ${isToday ? 'ring-1 ring-white/70' : ''}`}
+                    style={{
+                      background: d.future ? 'transparent' : d.minutes ? `color-mix(in srgb, var(--a1) ${Math.round(25 + k * 75)}%, transparent)` : 'rgba(255,255,255,.06)',
+                      boxShadow: d.minutes && k > 0.6 ? '0 0 8px color-mix(in srgb, var(--a1) 60%, transparent)' : undefined,
+                    }}
+                  />
+                );
+              })}
+            </div>
+          ))}
+        </div>
+      </div>
+      <div className="mt-1 grid grid-cols-12 gap-[3px] pl-4 text-[9px] font-semibold capitalize text-white/35">
+        {months.map((m, i) => <span key={i} className="truncate">{m}</span>)}
+      </div>
+      <div className="mt-3 flex items-center justify-end gap-1.5 text-[10px] text-white/40">
+        Mindre
+        {[0.06, 0.3, 0.55, 0.8, 1].map((o, i) => (
+          <span key={i} className="h-2.5 w-2.5 rounded-[3px]" style={{ background: i === 0 ? 'rgba(255,255,255,.06)' : `color-mix(in srgb, var(--a1) ${Math.round(o * 100)}%, transparent)` }} />
+        ))}
+        Mer
       </div>
     </div>
   );
@@ -191,6 +250,8 @@ export function Profile() {
       {dogs.map((d) => <DogCard key={d} dog={d} />)}
 
       <SectionTitle kicker="Aktivitet" title="Veckan i siffror" />
+      <Heatmap />
+      <div className="h-3" />
       <WeekChart />
 
       <div className="grid grid-cols-3 gap-2">

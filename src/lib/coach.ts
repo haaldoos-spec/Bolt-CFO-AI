@@ -1,6 +1,7 @@
 import type { AppState, DisciplineId, DogId, ProfileId } from '../types';
 import { DISCIPLINES, EXERCISES } from '../data/training';
 import { ageText, daysUntilHome, dogsOf, homeDateText } from '../data/profiles';
+import { loadStatus, todayRings } from './insights';
 import { streakFor } from './xp';
 
 export interface Insight {
@@ -113,6 +114,29 @@ export function generateInsights(state: AppState, profile: ProfileId): Insight[]
       body: `Varva hundarna: ${state.dogs.senior.name} gör nosarbete medan ${state.dogs.puppy.name} tränar passivitet på filten – sedan byter ni. Den som väntar lär sig minst lika mycket som den som jobbar.`,
       cta: { label: 'Par-pass 30 min', discipline: 'mix', minutes: 30 },
     });
+  }
+
+  // Belastning och dagsmål (avancerade nyckeltal)
+  for (const dog of dogs) {
+    const info = state.dogs[dog];
+    if (dog === 'puppy' && daysUntilHome(info.birth) > 0) continue;
+    const ld = loadStatus(state, dog);
+    if (ld.level === 'hog') {
+      out.unshift({
+        id: `load-${dog}`,
+        tone: 'rest',
+        title: `${info.name}: hög belastning i veckan`,
+        body: `${ld.advice} Hjärnan och lederna behöver återhämtning för att träningen ska sätta sig.`,
+        cta: { label: 'Lugnt sök 15 min', discipline: 'sok', minutes: 15 },
+      });
+    } else if (ld.level === 'redo') {
+      out.push({ id: `load-${dog}`, tone: 'push', title: `${info.name} är redo för mer`, body: ld.advice, cta: { label: 'Pass 30 min', discipline: 'mix', minutes: 30 } });
+    }
+    const r = todayRings(state, dog);
+    const left = r.goal - r.activity.min;
+    if (r.activity.min > 0 && left > 0) {
+      out.push({ id: `goal-${dog}`, tone: 'fun', title: `${left} min kvar för ${info.name} idag`, body: `Ni har tränat ${r.activity.min} av ${r.goal} minuter. Ett kort pass stänger dagens ring.`, cta: { label: `${Math.min(15, Math.max(5, left))} min-pass`, discipline: 'mix', minutes: 15 } });
+    }
   }
 
   const streak = streakFor(state);

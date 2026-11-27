@@ -17,7 +17,7 @@ export default function App() {
       <Background />
       <div className="mx-auto min-h-[100dvh] max-w-lg pb-[calc(env(safe-area-inset-bottom)+110px)]">
         <Header />
-        <main key={tab} className="animate-fade px-4 pt-5">
+        <main key={tab} className="page-in px-4 pt-5">
           {tab === 'home' && <Home />}
           {tab === 'map' && <Places />}
           {tab === 'training' && <Training />}

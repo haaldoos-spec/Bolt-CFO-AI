@@ -25,7 +25,7 @@ export function Header() {
       <div className="mb-4 flex items-center justify-between px-1">
         <div>
           <div className="label">{greet}</div>
-          <div key={profile} className="animate-rise font-display text-[26px] font-semibold leading-tight">
+          <div key={profile} className="animate-rise font-display text-[30px] font-semibold leading-[1.05] tracking-[-0.015em]">
             <span className="text-grad">{nameOf(profile)}</span>
           </div>
           <div className="text-xs font-medium text-white/55">{sub}</div>

@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import {
   Bone, Cable, Coffee, Cookie, Disc, Disc3, Dumbbell, Fence, Flag, Footprints, House, LifeBuoy, Link, Megaphone,
@@ -36,7 +36,39 @@ export function Avatar({ dog, size = 48, ring = false, className = '' }: { dog: 
   );
 }
 
+/** Räknar mjukt upp till ett värde (för siffror som ska kännas levande) */
+export function useCountUp(value: number, ms = 650) {
+  const [shown, setShown] = useState(value);
+  const from = useRef(value);
+  useEffect(() => {
+    const start = performance.now();
+    const a = from.current;
+    let raf = 0;
+    const step = (t: number) => {
+      const k = Math.min(1, (t - start) / ms);
+      const eased = 1 - Math.pow(1 - k, 3);
+      setShown(Math.round(a + (value - a) * eased));
+      if (k < 1) raf = requestAnimationFrame(step);
+      else from.current = value;
+    };
+    raf = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(raf);
+  }, [value, ms]);
+  return shown;
+}
+
+export function CountUp({ value }: { value: number }) {
+  return <>{useCountUp(value)}</>;
+}
+
 export function Sheet({ open, onClose, children, title }: { open: boolean; onClose: () => void; children: ReactNode; title?: string }) {
+  // Dra ner panelen för att stänga
+  const [drag, setDrag] = useState(0);
+  const start = useRef<number | null>(null);
+  const panel = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!open) setDrag(0);
+  }, [open]);
   useEffect(() => {
     if (!open) return;
     const prev = document.body.style.overflow;
@@ -48,10 +80,29 @@ export function Sheet({ open, onClose, children, title }: { open: boolean; onClo
   if (!open) return null;
   return createPortal(
     <div className="fixed inset-0 z-[1000] flex items-end justify-center">
-      <div className="absolute inset-0 animate-fade bg-black/60 backdrop-blur-sm" onClick={onClose} />
-      <div className="glass-strong relative max-h-[92dvh] w-full max-w-lg animate-sheet overflow-y-auto rounded-b-none border-b-0 bg-[color-mix(in_srgb,var(--bg)_82%,transparent)] px-5 pb-[calc(env(safe-area-inset-bottom)+24px)] pt-3 no-scrollbar">
+      <div className="absolute inset-0 animate-fade bg-black/60 backdrop-blur-md" style={{ opacity: 1 - Math.min(drag / 400, 0.6) }} onClick={onClose} />
+      <div
+        ref={panel}
+        className="glass-strong no-edge relative max-h-[92dvh] w-full max-w-lg animate-sheet overflow-y-auto rounded-b-none border-t border-white/15 bg-[color-mix(in_srgb,var(--bg)_86%,transparent)] px-5 pb-[calc(env(safe-area-inset-bottom)+24px)] pt-3 no-scrollbar"
+        style={{ transform: drag ? `translateY(${drag}px)` : undefined, transition: start.current === null ? 'transform .35s cubic-bezier(.2,.9,.2,1)' : 'none' }}
+        onTouchStart={(e) => {
+          // Bara när panelen är uppskrollad till toppen
+          if ((panel.current?.scrollTop ?? 0) <= 0) start.current = e.touches[0].clientY;
+        }}
+        onTouchMove={(e) => {
+          if (start.current === null) return;
+          const dy = e.touches[0].clientY - start.current;
+          setDrag(dy > 0 ? dy : 0);
+        }}
+        onTouchEnd={() => {
+          const close = drag > 110;
+          start.current = null;
+          if (close) onClose();
+          else setDrag(0);
+        }}
+      >
         <div className="sticky top-0 z-10 -mx-5 mb-2 flex items-center justify-between bg-gradient-to-b from-[var(--bg)] to-transparent px-5 pb-2 pt-1">
-          <div className="mx-auto h-1.5 w-10 rounded-full bg-white/25" />
+          <div className="mx-auto h-1.5 w-10 rounded-full bg-white/30" />
           <button onClick={onClose} aria-label="Stäng" className="absolute right-4 top-1 grid h-9 w-9 place-items-center rounded-full bg-white/10 transition active:scale-90">
             <X size={18} />
           </button>
@@ -123,8 +174,13 @@ export function SectionTitle({ kicker, title, right }: { kicker?: string; title:
   return (
     <div className="mb-3 mt-7 flex items-end justify-between px-1">
       <div>
-        {kicker && <div className="label mb-1">{kicker}</div>}
-        <h2 className="font-display text-[22px] font-semibold leading-tight">{title}</h2>
+        {kicker && (
+          <div className="label mb-1.5 flex items-center gap-2">
+            <span className="h-px w-4" style={{ background: 'linear-gradient(90deg, var(--a2), transparent)' }} />
+            {kicker}
+          </div>
+        )}
+        <h2 className="font-display text-[23px] font-semibold leading-tight tracking-[-0.01em]">{title}</h2>
       </div>
       {right}
     </div>
@@ -204,9 +260,14 @@ export function Toast() {
 export function Background() {
   return (
     <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden" style={{ background: 'var(--bg)' }}>
+      <div
+        className="aurora absolute left-1/2 top-[30%] h-[140vmax] w-[140vmax] -translate-x-1/2 -translate-y-1/2 opacity-[0.16] blur-[80px]"
+        style={{ background: 'conic-gradient(from 0deg, var(--b1), transparent 25%, var(--b2), transparent 55%, var(--b3), transparent 85%, var(--b1))' }}
+      />
       <div className="absolute -left-24 -top-24 h-80 w-80 animate-floaty rounded-full opacity-50 blur-[90px]" style={{ background: 'var(--b1)' }} />
       <div className="absolute -right-20 top-1/3 h-96 w-96 animate-floaty rounded-full opacity-35 blur-[110px] [animation-delay:-5s]" style={{ background: 'var(--b2)' }} />
       <div className="absolute -bottom-24 left-1/4 h-80 w-80 animate-floaty rounded-full opacity-30 blur-[100px] [animation-delay:-9s]" style={{ background: 'var(--b3)' }} />
+      <div className="absolute inset-0" style={{ background: 'radial-gradient(120% 90% at 50% 0%, transparent 40%, rgba(0,0,0,.55) 100%)' }} />
       <div className="absolute inset-0 opacity-[0.035] mix-blend-overlay" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%27160%27 height=%27160%27%3E%3Cfilter id=%27n%27%3E%3CfeTurbulence baseFrequency=%27.8%27/%3E%3C/filter%3E%3Crect width=%27100%25%27 height=%27100%25%27 filter=%27url(%23n)%27/%3E%3C/svg%3E")' }} />
     </div>
   );
