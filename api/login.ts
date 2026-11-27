@@ -1,4 +1,4 @@
-import { MAX_AGE, cookieHeader, json, makeToken, safeEqual, type Role } from './_session';
+import { MAX_AGE, cookieHeader, json, makeToken, safeEqual, type Role } from './_session.js';
 
 export async function POST(request: Request) {
   let password = '';
