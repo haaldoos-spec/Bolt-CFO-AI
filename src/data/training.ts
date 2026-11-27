@@ -78,14 +78,14 @@ export const DISCIPLINES: Discipline[] = [
   {
     id: 'sok', name: 'Sök', tagline: 'Nosework & doftsök', goalLabel: 'Doftprov & NW1', icon: 'Search',
     rules: {
-      org: 'Svenska Nose Work Klubben (SNWK) – Regler för prov och tävling', period: 'Regler 2022–2026 (2027 års regler ej kontrollerade)', official: true,
+      org: 'Svenska Nose Work Klubben (SNWK) – Regler för prov och tävling', period: 'Gäller 2027-01-01 – 2031-12-31', official: true,
       facts: [
         'Doftprov från 10 månader, tävling från 12 månader. Godkänt doftprov krävs för att tävla och gäller hela livet.',
-        'Doftprovet: 12 likadana kartonger, eukalyptus i en. Hunden ska visa rätt kartong inom 3 minuter och föraren säger ”markerat”.',
+        'Doftprovet: 12 nya, likadana stängda kartonger (minst 30×20×10 cm) i en eller två rader, eukalyptus i en. Hunden har 3 minuter på sig och föraren säger ”markerat”. Vid fel visar domaren rätt kartong så du kan belöna.',
         'NW1: bara eukalyptus, en gömma i varje moment. Fyra moment – behållarsök (bara kartonger), inomhussök, utomhussök och fordonssök (1–3 fordon) – à 25 poäng.',
         'Gömmor inomhus och utomhus högst 120 cm upp, och hunden ska kunna nå ända fram.',
-        'Söktid 1–5 minuter per sökområde. Tiden stoppas när föraren säger ”markerat”; fel markering avbryter momentet.',
-        'Du får belöna hunden under söket – även med godis.',
+        'Söktid 2–5 minuter per sökområde (från 2027, tidigare 1–5). Tiden stoppas på ”markerat”; fel markering avbryter momentet, men domaren visar gömman så att hunden kan belönas där.',
+        'Du får belöna hunden under söket – även med godis – men ansvarar för att det inte blir smitta vid gömman. Täcke, lindor och skydd är inte tillåtna under söket.',
       ],
     },
   },
