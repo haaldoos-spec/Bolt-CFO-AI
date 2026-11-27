@@ -1,11 +1,12 @@
 import { useRef, useState } from 'react';
-import { Camera, Clock, Flame, Image as ImageIcon, Pencil, RotateCcw, Star, Trophy } from 'lucide-react';
+import { Camera, Clock, Download, Flame, Image as ImageIcon, Pencil, RotateCcw, Star, Trophy, Upload } from 'lucide-react';
 import type { DogId } from '../types';
 import { useApp } from '../store/AppContext';
 import { ageText, dogsOf } from '../data/profiles';
 import { heatmap } from '../lib/insights';
 import { BACKUP_KEY } from '../store/AppContext';
 import { mergeStates } from '../lib/sync';
+import { parseImport, saveBackup } from '../lib/backupFile';
 import type { AppState } from '../types';
 import { DISCIPLINES } from '../data/training';
 import { disciplineProgress } from '../lib/coach';
@@ -244,6 +245,33 @@ export function Profile() {
   })();
   const dogs = dogsOf(profile);
   const [confirmReset, setConfirmReset] = useState(false);
+  const importRef = useRef<HTMLInputElement>(null);
+  const [fileBusy, setFileBusy] = useState(false);
+
+  const exportAll = async () => {
+    setFileBusy(true);
+    try {
+      if (await saveBackup(state)) toast('Säkerhetskopian är sparad');
+    } catch {
+      toast('Kunde inte spara filen');
+    } finally {
+      setFileBusy(false);
+    }
+  };
+  const importAll = async (file: File) => {
+    setFileBusy(true);
+    try {
+      const { merged, added } = parseImport(await file.text(), state);
+      dispatch({ type: 'replace', state: merged });
+      const total = added.places + added.memories + added.sessions;
+      toast(total ? `Hämtade in ${added.places} platser, ${added.memories} minnen och ${added.sessions} pass` : 'Allt i filen fanns redan');
+    } catch (e) {
+      toast(e instanceof Error ? e.message : 'Kunde inte läsa filen');
+    } finally {
+      setFileBusy(false);
+      if (importRef.current) importRef.current.value = '';
+    }
+  };
 
   return (
     <div className="animate-rise space-y-4">
@@ -322,6 +350,21 @@ export function Profile() {
           <RotateCcw size={16} /> Återställ {backupMissing.n} saknade från enhetens säkerhetskopia
         </button>
       )}
+      <div className="glass mt-6 space-y-3 p-4">
+        <div>
+          <div className="text-sm font-semibold">Flytta eller säkerhetskopiera</div>
+          <div className="text-xs text-white/50">Sparar platser, minnen, bilder och pass i en fil. Använd den för att flytta allt till en annan enhet eller adress.</div>
+        </div>
+        <div className="grid grid-cols-2 gap-2">
+          <button onClick={exportAll} disabled={fileBusy} className="btn-accent flex items-center justify-center gap-2 disabled:opacity-50">
+            <Download size={16} /> Spara allt till fil
+          </button>
+          <button onClick={() => importRef.current?.click()} disabled={fileBusy} className="btn-ghost flex items-center justify-center gap-2 disabled:opacity-50">
+            <Upload size={16} /> Hämta in från fil
+          </button>
+        </div>
+        <input ref={importRef} type="file" accept=".json,application/json" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) void importAll(f); }} />
+      </div>
       <div className={`glass mt-6 flex items-center gap-3 p-4 text-sm ${syncStatus === 'fel' ? 'border-rose-300/30' : ''}`}>
         <span
           className={`h-2.5 w-2.5 shrink-0 rounded-full ${syncStatus === 'synkad' ? 'bg-emerald-400' : syncStatus === 'ansluter' ? 'animate-pulse bg-amber-300' : syncStatus === 'fel' ? 'bg-rose-400' : 'bg-white/40'}`}
@@ -335,7 +378,7 @@ export function Profile() {
               ? 'Platser, minnen, pass och framsteg följer med på alla dina enheter.'
               : syncStatus === 'fel'
                 ? 'Ändringarna sparas på enheten och synkas när anslutningen fungerar igen.'
-                : 'Öppna appen via länken i Claude för att synka mellan enheter.'}
+                : 'Spara en kopia med "Spara allt till fil" ovan, särskilt innan du byter telefon eller rensar webbläsaren.'}
           </div>
         </div>
       </div>
