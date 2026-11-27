@@ -12,25 +12,25 @@ export interface ThemeDef {
 
 export const THEMES: Record<ProfileId, ThemeDef> = {
   senior: {
-    a1: '#93c5fd',
-    a2: '#a78bfa',
-    bg: '#0a0c1a',
-    ink: '#0b1024',
-    blobs: ['#3b5bdb', '#7c3aed', '#38bdf8'],
+    a1: '#3b6fe0',
+    a2: '#1e3a8a',
+    bg: '#070b1f',
+    ink: '#ffffff',
+    blobs: ['#1e3a8a', '#2563eb', '#1d4ed8'],
   },
   puppy: {
-    a1: '#fcd34d',
-    a2: '#fdba8c',
-    bg: '#16110a',
-    ink: '#2a1a05',
-    blobs: ['#f59e0b', '#fb923c', '#fde68a'],
+    a1: '#2dd4bf',
+    a2: '#14b8a6',
+    bg: '#06161a',
+    ink: '#042f2e',
+    blobs: ['#0d9488', '#06b6d4', '#5eead4'],
   },
   both: {
-    a1: '#a78bfa',
-    a2: '#fcd34d',
-    bg: '#110e1c',
-    ink: '#1a1030',
-    blobs: ['#7c3aed', '#f59e0b', '#60a5fa'],
+    a1: '#3b6fe0',
+    a2: '#2dd4bf',
+    bg: '#08111c',
+    ink: '#ffffff',
+    blobs: ['#1e3a8a', '#14b8a6', '#2563eb'],
   },
 };
 

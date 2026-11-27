@@ -41,7 +41,7 @@ function DogCard({ dog }: { dog: DogId }) {
 
   return (
     <div className="glass relative overflow-hidden p-5">
-      <div className="pointer-events-none absolute -right-14 -top-14 h-48 w-48 rounded-full opacity-35 blur-3xl" style={{ background: dog === 'senior' ? '#8b5cf6' : '#f59e0b' }} />
+      <div className="pointer-events-none absolute -right-14 -top-14 h-48 w-48 rounded-full opacity-35 blur-3xl" style={{ background: dog === 'senior' ? '#2563eb' : '#14b8a6' }} />
       <div className="relative flex items-center gap-4">
         <div className="relative">
           <Ring value={lv.pct} size={96} stroke={5}>
@@ -197,8 +197,8 @@ function WeekChart() {
         </div>
         {dogs.length > 1 && (
           <div className="flex gap-3 text-[11px] font-semibold text-white/60">
-            <span className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full bg-[#a78bfa]" />Senior</span>
-            <span className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full bg-[#fcd34d]" />Valp</span>
+            <span className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full bg-[#3b6fe0]" />Senior</span>
+            <span className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full bg-[#2dd4bf]" />Valp</span>
           </div>
         )}
       </div>
@@ -213,7 +213,7 @@ function WeekChart() {
                   title={`${m} min`}
                   style={{
                     height: `${Math.max(4, (m / max) * 100)}%`,
-                    background: dogs.length > 1 ? (dogs[j] === 'senior' ? '#a78bfa' : '#fcd34d') : 'linear-gradient(180deg,var(--a1),var(--a2))',
+                    background: dogs.length > 1 ? (dogs[j] === 'senior' ? '#3b6fe0' : '#2dd4bf') : 'linear-gradient(180deg,var(--a1),var(--a2))',
                     opacity: m ? 1 : 0.18,
                   }}
                 />
