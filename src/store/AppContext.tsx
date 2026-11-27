@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useMemo, useReducer, useRef, useState, type ReactNode } from 'react';
+import { deletePhotos, getAllPhotos, putPhotos } from '../lib/photoStore';
 import { mergeStates, startSync, type SyncHandle, type SyncStatus } from '../lib/sync';
 import type { SessionPlan } from '../lib/session';
 import type { AppState, CheckIn, CustomPass, Exercise, Place, DisciplineId, DogId, DogInfo, ProfileId, SessionRecord, TabId } from '../types';
@@ -262,22 +263,79 @@ export function AppProvider({ children }: { children: ReactNode }) {
     syncRef.current?.push(state);
   }, [state]);
 
+  // Foton ligger i IndexedDB (rymmer mycket mer än localStorage). De finns kvar i minnet som förut,
+  // så resten av appen och Claude-synken är oförändrade; bara själva sparandet skiljer sig.
+  // Artefakt-bygget (inne i Claude) sparar som förut: Claudes egen lagring håller redan bilderna.
+  const usePhotoDb = import.meta.env.VITE_ARTIFACT !== '1';
+  const savedPhotos = useRef(new Set<string>());
+  const storageWarned = useRef(false);
+  const warnStorage = (msg: string) => {
+    if (!usePhotoDb || storageWarned.current) return;
+    storageWarned.current = true;
+    const id = Date.now();
+    setToastMsg({ id, msg });
+    setTimeout(() => setToastMsg((cur) => (cur?.id === id ? null : cur)), 7000);
+  };
+
+  // Läs tillbaka foton från IndexedDB vid start
   useEffect(() => {
-    try {
-      localStorage.setItem(KEY, JSON.stringify(state));
-    } catch {
-      /* fullt lagringsutrymme – ignorera i prototypen */
+    if (!usePhotoDb) return;
+    let alive = true;
+    getAllPhotos()
+      .then((photos) => {
+        if (!alive) return;
+        Object.keys(photos).forEach((id) => savedPhotos.current.add(id));
+        const cur = stateRef.current;
+        if (cur.checkins.some((c) => !c.photo && photos[c.id])) {
+          dispatch({ type: 'replace', state: { ...cur, checkins: cur.checkins.map((c) => (c.photo || !photos[c.id] ? c : { ...c, photo: photos[c.id] })) } });
+        }
+      })
+      .catch(() => {});
+    return () => {
+      alive = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    const persist = () => {
+      // Foton som är säkrade i IndexedDB tas bort ur localStorage-kopian (annars blir den full)
+      const slim: AppState = { ...state, checkins: state.checkins.map((c) => (c.photo && savedPhotos.current.has(c.id) ? { ...c, photo: undefined } : c)) };
+      try {
+        localStorage.setItem(KEY, JSON.stringify(slim));
+      } catch {
+        warnStorage('Lagringsutrymmet är fullt – nya ändringar kan försvinna. Gå till Statistik och välj "Spara allt till fil".');
+      }
+      // Säkerhetskopia på enheten: sparar alltid det som någon gång funnits (inget tas bort härifrån
+      // utom det användaren själv raderat), så att data kan återställas om något går fel
+      try {
+        const raw = localStorage.getItem(BACKUP_KEY);
+        const prev = raw ? (JSON.parse(raw) as AppState) : null;
+        const next = prev ? mergeStates(prev, slim) : slim;
+        localStorage.setItem(BACKUP_KEY, JSON.stringify(next));
+      } catch {
+        /* för lite utrymme för kopian – hoppa över */
+      }
+    };
+    // Städa bort foton för minnen som användaren raderat
+    const gone = (state.deletedIds ?? []).filter((id) => savedPhotos.current.has(id));
+    if (gone.length) {
+      deletePhotos(gone).then(() => gone.forEach((id) => savedPhotos.current.delete(id))).catch(() => {});
     }
-    // Säkerhetskopia på enheten: sparar alltid det som någon gång funnits (inget tas bort härifrån
-    // utom det användaren själv raderat), så att data kan återställas om något går fel
-    try {
-      const raw = localStorage.getItem(BACKUP_KEY);
-      const prev = raw ? (JSON.parse(raw) as AppState) : null;
-      const next = prev ? mergeStates(prev, state) : state;
-      localStorage.setItem(BACKUP_KEY, JSON.stringify(next));
-    } catch {
-      /* för lite utrymme för kopian – hoppa över */
+    const pending = usePhotoDb ? state.checkins.filter((c) => c.photo && !savedPhotos.current.has(c.id)) : [];
+    if (!pending.length) {
+      persist();
+    } else {
+      putPhotos(pending.map((c) => [c.id, c.photo as string]))
+        .then(() => pending.forEach((c) => savedPhotos.current.add(c.id)))
+        .catch(() => warnStorage('Bilderna kunde inte sparas säkert på den här enheten. Spara en kopia via Statistik → "Spara allt till fil".'))
+        .finally(() => {
+          if (!cancelled) persist();
+        });
     }
+    return () => {
+      cancelled = true;
+    };
   }, [state]);
 
   // Applicera tema som CSS-variabler (animeras via @property i index.css)
