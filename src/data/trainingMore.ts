@@ -244,7 +244,7 @@ export const MORE_EXERCISES: Exercise[] = [
   },
   {
     id: 'r-bana-fortsattning', discipline: 'rally', level: 'program', title: 'Bana: Mot fortsättningsklass',
-    summary: 'En träningsbana utan koppel med slalom, tempobyten och 270°-svängar – steget efter nybörjarklass.',
+    summary: 'En träningsbana utan koppel med 14 moment (2027: 14–16), varav 7 från fortsättningsklassen – steget efter nybörjarklass.',
     suits: ['puppy', 'senior'], minutes: 25, intensity: 2, equipment: ['skyltar', 'koner', 'godis'],
     builtFrom: ['r-bana-nyborjare', 'r-kedja-slalom', 'r-kedja-position', 'r-hoger'],
     moments: [
@@ -261,6 +261,7 @@ export const MORE_EXERCISES: Exercise[] = [
       '223 Sitt, gå ifrån, kalla in',
       '108 270° vänster',
       '119 Spiral höger',
+      '128 Sitt, gå runt',
       'Mål',
     ],
     steps: [
@@ -763,6 +764,19 @@ export const MORE_EXERCISES: Exercise[] = [
     },
   },
   {
+    id: 'v-runt-koner', discipline: 'vardag', level: 'byggsten', title: 'Sändande runt koner',
+    summary: 'Startklassmoment från 2027: hunden skickas runt en grupp om 3–6 koner ca 5 m bort och kommer tillbaka till fot.',
+    suits: ['puppy', 'senior'], minutes: 8, intensity: 1, equipment: ['koner', 'godis'],
+    builtFrom: ['a-runt-kon'],
+    steps: [
+      'Ställ 3 koner tätt ihop 1 m bort. Lura hunden runt med godis och belöna när den kommer tillbaka.',
+      'Säg ”runt” och peka. Öka avståndet steg för steg till ca 5 m.',
+      'Avsluta med ”fot” – hunden ska komma in i utgångsställning efter varvet.',
+    ],
+    criteria: ['Runt konerna på signal från 5 m', 'Tillbaka till fot utan extra kommando'],
+    labbeHack: { puppy: 'Lugnt tempo och vida svängar runt konerna tills lederna är färdigväxta.' },
+  },
+  {
     id: 'r-utan-godis', discipline: 'rally', level: 'byggsten', title: 'Belöning efter mål',
     summary: 'På tävling får du inte ha godis eller leksak på banan. Träna så att belöningen kommer efter mål.',
     suits: ['puppy', 'senior'], minutes: 8, intensity: 1, equipment: ['godis', 'skyltar'],
@@ -795,10 +809,11 @@ export const BASE_PROGRAM_MOMENTS: Record<string, string[]> = {
     'Följsamhet – 30–50 m med höger- och vänstersväng och 5–10 m språngmarsch, avslut helt om halt (koeff. 4)',
     'Inkallande – hunden sitter kvar, du går ca 15 m, vänder och kallar in (koeff. 3)',
     'Sitt under marsch – sitt efter ca 5 m, du rundar en kon, passerar hunden och tar med den på ”fot” (koeff. 3)',
-    'Apportering – apportbock av trä läggs ca 3 m från hunden, du står ca 10 m bort (koeff. 3)',
+    'Apportering – apportbock av trä läggs ca 3 m från hunden, du står ca 10 m bort (koeff. 2)',
     'Fjärrdirigering – från sitt till ligg på ca 5 m avstånd (koeff. 2)',
     'Hopp över hinder – täckt hinder i mankhöjd, högst 50 cm (koeff. 2)',
-    'Helhetsintryck – glädje och samarbete under och mellan momenten (koeff. 3)',
+    'Sändande runt koner – 3–6 koner ca 5 m bort, runt och tillbaka till fot (koeff. 2, nytt 2027)',
+    'Helhetsintryck – glädje och samarbete under och mellan momenten (koeff. 2)',
   ],
   'r-bana-nyborjare': [
     'Start',
@@ -813,7 +828,7 @@ export const BASE_PROGRAM_MOMENTS: Record<string, string[]> = {
     '117 Normalt tempo',
     '128 Sitt, gå runt',
     '111 Sitt framför, höger ingång, framåt',
-    '123 Sitt, ett, två, tre steg, framåt',
+    '123 Sitt, ett steg fram sitt, två steg fram sitt, tre steg fram sitt',
     'Mål',
   ],
   's-anlag': ['Spårstart vid pinne', '100 m rakt', 'Vinkel', '100 m med föremål', 'Vinkel', '100 m till slutföremål'],

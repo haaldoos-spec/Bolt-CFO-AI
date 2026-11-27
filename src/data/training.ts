@@ -31,10 +31,12 @@ export const DISCIPLINES: Discipline[] = [
   {
     id: 'vardag', name: 'Vardagslydnad', tagline: 'Grunden för ett lugnt liv ihop', goalLabel: 'Startklass Lydnad', icon: 'Home',
     rules: {
-      org: 'Svenska Brukshundklubben (SBK) – Regler lydnadstävling', period: 'Gäller 2023-01-01 – 2026-12-31', official: true,
+      org: 'Svenska Brukshundklubben (SBK) – Regler lydnadstävling startklass–klass 2', period: 'Gäller 2027-01-01 – 2031-12-31', official: true,
       facts: [
         'Hunden ska ha fyllt 10 månader (dagen före tävlingen) för startklass.',
-        'Sex moment + helhetsintryck: Följsamhet (koeff. 4), Inkallande (3), Sitt under marsch (3), Apportering (3), Fjärrdirigering (2), Hopp över hinder (2), Helhetsintryck (3).',
+        'Från 2027 har startklassen sju moment + helhetsintryck: Följsamhet (koeff. 4), Inkallande (3), Sitt under marsch (3), Apportering (2), Fjärrdirigering (2), Hopp över hinder (2), Sändande runt koner (2), Helhetsintryck (2) – totalt 20.',
+        'Nytt 2027 – Sändande runt koner: 3–6 koner ca 5 m från startlinjen; hunden skickas runt dem och kommer tillbaka till utgångsställning.',
+        'Till och med 31 dec 2026 gäller 2023 års regler: inget konmoment, och apportering och helhetsintryck har koeff. 3.',
         'Följsamhet: lös eller kopplad, 30–50 m med en höger- och en vänstersväng och 5–10 m språngmarsch.',
         'Inkallande från ca 15 m. Apportbock av trä läggs ca 3 m från hunden och du står ca 10 m bort.',
         'Fjärrdirigering: från sitt till ligg på ca 5 m avstånd. Hopp: täckt hinder i mankhöjd, högst 50 cm.',
@@ -46,22 +48,22 @@ export const DISCIPLINES: Discipline[] = [
   {
     id: 'rally', name: 'Rallylydnad', tagline: 'Skylt för skylt, glädje hela vägen', goalLabel: 'Rally Nybörjarklass', icon: 'Signpost',
     rules: {
-      org: 'Svenska Brukshundklubben (SBK) – Regler rallylydnad', period: 'Gäller 2023-01-01 – 2026-12-31', official: true,
+      org: 'Svenska Brukshundklubben (SBK) – Regler rallylydnad', period: 'Gäller 2027-01-01 – 2031-12-31', official: true,
       facts: [
         'Hunden ska ha fyllt 10 månader (dagen före tävlingen).',
-        'Nybörjarklass: 12–15 moment (start och mål räknas inte), hunden i löst hängande koppel. Momenten är skylt 101–138.',
+        'Nybörjarklass: 12–14 moment (start och mål räknas inte), hunden i löst hängande koppel. Momenten är skylt 101–138.',
         'Sele är tillåten bara i nybörjarklass, och kopplet ska fästas på ryggen/manken.',
-        'Du får prata och berömma men inte medvetet röra hunden. Godis eller leksak synligt på banan = diskvalificering.',
+        'Du får prata och berömma men inte medvetet röra hunden. Godis synligt eller i handen, eller leksak synlig på banan = diskvalificering.',
         'Man startar med 100 poäng. Minst 70 är kvalificerande; tre kvalificerande eller en 100-poängare ger uppflyttning. Tre kvalificerande ger RLD N.',
-        'Fortsättningsklass: okopplad, 13–17 moment varav minst 5 från fortsättningsklassen (skylt 201–). Kvalificerande från 75 poäng.',
-        'Förslaget till nya regler från 2027: nybörjarklass 12–14 moment och inga nya nybörjarmoment.',
+        'Fortsättningsklass: okopplad, 14–16 moment varav minst 5 från fortsättningsklassen (skylt 201–), högst ett hinder. Kvalificerande från 75 poäng.',
+        'Till och med 31 dec 2026 gäller 2023 års regler (nybörjarklass 12–15 och fortsättningsklass 13–17 moment).',
       ],
     },
   },
   {
     id: 'spar', name: 'Spår', tagline: 'Följ doften steg för steg', goalLabel: 'Viltspårprov anlagsklass', icon: 'Footprints',
     rules: {
-      org: 'SKK – Regler för viltspårprov', period: 'Gäller 2022-01-01 – 2026-12-31', official: true,
+      org: 'SKK – Regler för viltspårprov', period: 'Regler 2022–2026 (SKK har inte publicerat 2027 års regler än)', official: true,
       facts: [
         'Hunden ska ha fyllt 9 månader. Anlagsklass först – öppen klass kräver godkänd anlagsklass.',
         'Spåret är 600–700 m med fyra vinklar, minst 50 m mellan vinklarna, i mestadels skogsmark.',
@@ -76,7 +78,7 @@ export const DISCIPLINES: Discipline[] = [
   {
     id: 'sok', name: 'Sök', tagline: 'Nosework & doftsök', goalLabel: 'Doftprov & NW1', icon: 'Search',
     rules: {
-      org: 'Svenska Nose Work Klubben (SNWK) – Regler för prov och tävling', period: 'Gäller 2022-01-01 – 2026-12-31', official: true,
+      org: 'Svenska Nose Work Klubben (SNWK) – Regler för prov och tävling', period: 'Regler 2022–2026 (2027 års regler ej kontrollerade)', official: true,
       facts: [
         'Doftprov från 10 månader, tävling från 12 månader. Godkänt doftprov krävs för att tävla och gäller hela livet.',
         'Doftprovet: 12 likadana kartonger, eukalyptus i en. Hunden ska visa rätt kartong inom 3 minuter och föraren säger ”markerat”.',
@@ -123,12 +125,14 @@ export const DISCIPLINES: Discipline[] = [
   {
     id: 'bruks', name: 'Bruks', tagline: 'Lydnad + spår eller sök – appellklass', goalLabel: 'Appellklass', icon: 'Medal',
     rules: {
-      org: 'Svenska Brukshundklubben (SBK) – Regler bruksprov', period: 'Gäller 2023-01-01 – 2026-12-31', official: true,
+      org: 'Svenska Brukshundklubben (SBK) – Regler bruksprov', period: 'Gäller 2027-01-01 – 2031-12-31', official: true,
       facts: [
         'Appellklass från 12 månader. Lägre klass kräver uppflyttning i appellklass och att hunden fyllt 18 månader.',
         'Från 18 månader krävs mentalbeskrivning (MH). För raser som SBK inte har avelsansvar för, som labrador, kan MH ersättas med BPH.',
         'Skyddshundsgruppen är bara öppen för raser som SBK har avelsansvar för – inte labrador. Spår, sök och rapport går bra.',
-        'Lydnad (koeff. 16): linförighet i koppel, framförgående, platsläggande, inkallande, hopp över hinder och platsliggande 3 min.',
+        'Lydnad 2027 (koeff. 16): linförighet i koppel (4), framförgående (2), platsläggande (2), inkallande (2), apportering (2), hopp över hinder (2) och platsliggande i koppel 3 min (2).',
+        'Nytt 2027: apportering (träbock, ca 3 m från hunden, du ca 10 m bort) och platsliggandet görs kopplat – hundarna ca 6 m isär, föraren en koppellängd (ca 1,5 m) bort.',
+        'Hinderhöjd för labrador enligt SBK:s rasförteckning: 65 cm i appell- och lägre klass (85 cm i högre klass och elit). En hund som är mindre än rasen kan mätas in individuellt från 18 månader.',
         'Specialmoment (koeff. 9): budföring ca 50 m + spår (ca 300 m, 40–50 min, tre föremål), rapportföring eller genomsök av område.',
         'Godkänt: 125 poäng varav 45 i specialmoment. Uppflyttning: 175 poäng varav 63.',
       ],
@@ -258,15 +262,15 @@ const BASE_EXERCISES: Exercise[] = [
   },
   {
     id: 'v-program-startklass', discipline: 'vardag', level: 'program', title: 'Program: Startklass Lydnad',
-    summary: 'Startklassens sex moment enligt SBK:s regler 2023–2026, i träningsform.',
+    summary: 'Startklassens moment enligt SBK:s regler 2027–2031, i träningsform.',
     suits: ['senior', 'puppy'], minutes: 25, intensity: 2, equipment: ['koppel', 'apport', 'godis', 'koner', 'hinder'],
-    builtFrom: ['v-linforing', 'v-kedja-inkallning', 'v-sitt-marsch', 'v-apport-lydnad', 'v-fjarr', 'v-hopp'],
+    builtFrom: ['v-linforing', 'v-kedja-inkallning', 'v-sitt-marsch', 'v-apport-lydnad', 'v-fjarr', 'v-hopp', 'v-runt-koner'],
     steps: [
       'Kör momenten ett och ett med belöning efter varje. Sätt ihop två och två när de sitter.',
-      'Träna tävlingslikt: ingen belöning eller beröring under momentet – bara mellan momenten.',
+      'Träna tävlingslikt: ingen godis eller leksak alls, och ingen beröring under momenten – beröm och klappar bara mellan momenten.',
       'Avsluta med en genomkörning av hela programmet och stor lek efteråt.',
     ],
-    criteria: ['Alla sex moment i följd med belöning bara mellan momenten', 'Avlämning av apportbocken i handen'],
+    criteria: ['Alla sju moment i följd utan belöning i ringen', 'Avlämning av apportbocken i handen'],
     labbeHack: {
       senior: 'Hoppet kan sänkas eller hoppas över i träning. Tävling är inte målet – glädjen är.',
       puppy: 'Kör programmet i delar och vänta med hoppet tills lederna är färdigväxta (ca 12–15 mån).',
