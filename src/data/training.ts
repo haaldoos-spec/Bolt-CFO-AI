@@ -1,6 +1,7 @@
 import type { Discipline, DisciplineId, Equipment, EquipmentId, Exercise } from '../types';
 import { BASE_PROGRAM_MOMENTS, MORE_EXERCISES } from './trainingMore';
 import { SPORT_EXERCISES } from './trainingSports';
+import { PUPPY_EXERCISES } from './trainingPuppy';
 
 export const EQUIPMENT: Record<EquipmentId, Equipment> = {
   klicker: { id: 'klicker', name: 'Klicker' },
@@ -28,6 +29,19 @@ export const EQUIPMENT: Record<EquipmentId, Equipment> = {
 };
 
 export const DISCIPLINES: Discipline[] = [
+  {
+    id: 'valp', name: 'Valpträning', tagline: 'Kyles första veckor – lek, trygghet och vardag', goalLabel: 'Valpkursen klar', icon: 'PawPrint',
+    rules: {
+      org: 'Ingen tävlingsgren', period: 'För valpar från 8 veckor', official: false,
+      facts: [
+        'Korta pass: 2–5 minuter, flera gånger om dagen. Sluta medan valpen fortfarande vill mer.',
+        'Valpen behöver 18–20 timmars sömn per dygn. Övertrött valp = mer bitande och mindre inlärning.',
+        'Inga hopp, trappor eller långa promenader under tillväxten – ca 5 minuters promenad per månad i ålder, två gånger om dagen.',
+        'Socialiseringsfönstret stänger kring 12–16 veckor: nya ljud, människor och underlag i lagom dos.',
+        'Valpkurs hos t.ex. en brukshundklubb eller studieförbund passar från ca 10–12 veckor, när valpen är vaccinerad.',
+      ],
+    },
+  },
   {
     id: 'vardag', name: 'Vardagslydnad', tagline: 'Grunden för ett lugnt liv ihop', goalLabel: 'Startklass Lydnad', icon: 'Home',
     rules: {
@@ -604,6 +618,7 @@ export const EXERCISES: Exercise[] = [
   ...BASE_EXERCISES.map((e) => (BASE_PROGRAM_MOMENTS[e.id] ? { ...e, moments: BASE_PROGRAM_MOMENTS[e.id] } : e)),
   ...MORE_EXERCISES,
   ...SPORT_EXERCISES,
+  ...PUPPY_EXERCISES,
 ];
 
 /** Egna övningar (från användarens data) – sätts av AppProvider */

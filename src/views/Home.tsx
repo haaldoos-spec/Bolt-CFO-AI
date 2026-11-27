@@ -285,7 +285,7 @@ export function Home() {
 
       <SectionTitle kicker="Fokus" title="Rekommenderade grenar" right={<button onClick={() => setTab('training')} className="text-xs font-semibold text-white/60">Alla <ChevronRight size={14} className="inline" /></button>} />
       <div className="-mx-4 flex gap-3 overflow-x-auto px-4 pb-1 no-scrollbar">
-        {DISCIPLINES.filter((d) => (profile === 'senior' ? ['sok', 'spar', 'tricks', 'vardag'] : profile === 'puppy' ? ['vardag', 'agility', 'rally', 'tricks'] : ['vardag', 'sok', 'tricks', 'rally']).includes(d.id)).map((d) => (
+        {DISCIPLINES.filter((d) => (profile === 'senior' ? ['sok', 'spar', 'tricks', 'vardag'] : profile === 'puppy' ? ['valp', 'vardag', 'agility', 'tricks'] : ['vardag', 'sok', 'tricks', 'rally']).includes(d.id)).map((d) => (
           <button key={d.id} onClick={() => openGenerator({ discipline: d.id, minutes: 15 })} className="glass w-40 shrink-0 p-4 text-left transition active:scale-95">
             <Sparkles size={18} className="mb-6 text-[var(--a2)]" />
             <div className="text-sm font-bold">{d.name}</div>
